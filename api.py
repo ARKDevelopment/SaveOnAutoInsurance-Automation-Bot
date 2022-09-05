@@ -1,10 +1,10 @@
+import csv
 from fastapi import FastAPI, WebSocket
 from fastapi.responses import HTMLResponse
 from starlette.responses import FileResponse
 from pydantic import BaseModel
-import sqlite3, uuid, csv, atexit
-
-atexit.register(lambda: conn.close())
+import sqlite3
+import uuid
 
 
 app = FastAPI()
@@ -23,7 +23,9 @@ phone TEXT,
 email TEXT
 ); """
 )
+
 conn.commit()
+conn.close()
 
 
 class AutoInsurance(BaseModel):
@@ -49,13 +51,13 @@ html = """
         <h3>Id, First Name, Last Name, Street Address, Zip, Phone, Email, Status</h2>
         <div id="log-body"></div>
         <script>
-            var ws = new WebSocket("ws://localhost:8000/ws");
+            var ws = new WebSocket("ws://localhost:8080/ws");
             ws.onmessage = function(event) {
                 var messages = document.getElementById('log-body')
                 var content = document.createTextNode(event.data)
                 messages.innerHTML = content.textContent
             };
-             setInterval(() => ws.send('sefesfae'), 100)
+             setInterval(() => ws.send('DataRequest'), 100)
         </script>
     </body>
 </html>
@@ -72,22 +74,30 @@ async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     while True:
       data = await websocket.receive_text()
+      con = sqlite3.connect('autoinsurance.db')
+      cur = con.cursor()
       cmd = cur.execute("SELECT * FROM log")
       data = cmd.fetchall()
       new_data = "<br/>".join([", ".join(x) for x in data])
+      con.close()
       await websocket.send_text(new_data)
 
 
 @app.get('/queued')
 def queued():
+    con = sqlite3.connect('autoinsurance.db')
+    cur = con.cursor()
     cmd = cur.execute("SELECT * FROM queue")
     data = cmd.fetchall()
-    return data
+    con.close()
+    return "<br/>".join(data)
 
 
 @app.post('/add-to-queue')
 async def automate(auto_insurance: AutoInsurance):
   idd = str(uuid.uuid4())
+  con = sqlite3.connect('autoinsurance.db')
+  cur = con.cursor()
   cur.execute(f"""INSERT INTO queue (
     id, 
     first_name, 
@@ -108,11 +118,14 @@ async def automate(auto_insurance: AutoInsurance):
         auto_insurance.phone, 
         auto_insurance.email))
         
-  conn.commit()
+  con.commit()
+  con.close()
   return auto_insurance
 
 @app.get('/download')
 def download_as_csv():
+    con = sqlite3.connect('autoinsurance.db')
+    cur = con.cursor()
     cmd = cur.execute("SELECT * FROM log")
     
     with open('logs.csv', 'w') as f:

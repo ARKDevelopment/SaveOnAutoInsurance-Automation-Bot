@@ -66,7 +66,14 @@ async def scroller(page, wait):
 
 async def main(first_name, last_name, street_address, city, zipp, phone, email):
   async with async_playwright() as p:
-    browser = await emulated_browser(p)
+    state = ziptostate(zipp)
+    state.lower().replace(" ", "+")
+    city = city.lower().replace(" ", "+")
+    browser = await emulated_browser(p, proxy={
+      'server': 'proxy.froxy.com:9000',
+      'username': 'XLdek13TDI94zkFC',
+      'password': f'wifi;us;;{state};{city}',
+      })
     # return [x for x in range(9)]
     page = await browser.new_page()
     try:
@@ -180,9 +187,14 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
 
     return year, make, model, insuredform, dob, gender, education, rating, random_device
 
+def proxy_test():
+  proxies = {"http" : 'XLdek13TDI94zkFC:wifi;us;;new+york;new+york@proxy.froxy.com:9000'}
 
+  r = requests.get("https://tools.keycdn.com/geo", proxies=proxies)
+  print(r.content)
 
 if __name__ == "__main__":
-  asyncio.run(main())
+  # proxy_test()
+  asyncio.run(main(first_name="John", last_name="Doe", street_address="123 Main St", city="New York", zipp="10005", phone="1234567890", email="flkflkf@lkdf.dmm"))
   # print(playwright_devices())
   # print(genderize('John'))
