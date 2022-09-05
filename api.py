@@ -152,4 +152,5 @@ def download_as_csv():
             ]
         )
         writer.writerows(cmd)
+    con.close()
     return FileResponse('logs.csv', media_type='text/csv', filename='logs.csv')
