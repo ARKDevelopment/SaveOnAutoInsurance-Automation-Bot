@@ -89,9 +89,9 @@ def queued():
     cur = con.cursor()
     cmd = cur.execute("SELECT * FROM queue")
     data = cmd.fetchall()
-    data = "<br/>".join(list(data))
+    data_str = "<br/>".join(list(str(data)))
     con.close()
-    return data
+    return data_str
 
 
 @app.post('/add-to-queue')
