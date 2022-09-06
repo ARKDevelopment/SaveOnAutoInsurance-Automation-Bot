@@ -89,7 +89,7 @@ def queued():
     cur = con.cursor()
     cmd = cur.execute("SELECT * FROM queue")
     data = cmd.fetchall()
-    data = "<br/>".join(data)
+    data = "<br/>".join(list(data))
     con.close()
     return data
 
