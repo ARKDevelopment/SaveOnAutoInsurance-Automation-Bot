@@ -58,7 +58,7 @@ async def sql_delete(item):
     cur.execute("UPDATE log SET status = ? WHERE id = ?", ('success', idd,))
     conn.commit()
     
-  except Exception as e:
+  except KeyboardInterrupt as e:
     # Update log if error
     error_msg = str(e).replace("=", "").replace("logs", "").replace(",", ".")
     cur.execute("UPDATE log SET status = ? WHERE id = ?", (error_msg, idd))

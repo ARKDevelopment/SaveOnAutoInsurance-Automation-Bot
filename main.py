@@ -10,7 +10,7 @@ phone = "1234567890"
 email = "heck@tor.com"
 
 PERCENT = 50
-percent = PERCENT
+percent = int(open("percantage.txt", "r").read())
 
 
 def genderize(name):
@@ -65,9 +65,6 @@ async def scroller(page, wait):
 
 async def main(first_name, last_name, street_address, city, zipp, phone, email):
   async with async_playwright() as p:
-    state = ziptostate(zipp)
-    state.lower().replace(" ", "+")
-    city = city.lower().replace(" ", "+")
     browser = await emulated_browser(p, 
       proxy={
         'server': 'proxy.froxy.com:9000',

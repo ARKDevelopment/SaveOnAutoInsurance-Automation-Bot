@@ -3,7 +3,7 @@ from fastapi import FastAPI, WebSocket, HTTPException
 from fastapi.responses import HTMLResponse
 from starlette.responses import FileResponse
 from pydantic import BaseModel
-from components import proxy_test, email_verified
+from components import proxy_test, email_verified, log_html, percent_html
 
 
 app = FastAPI()
@@ -37,37 +37,30 @@ class AutoInsurance(BaseModel):
 	email: str
 
 
-html = """
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Logs</title>
-    </head>
-    <body>
-        <div>
-        <a href='/download' style='float:right'>Download csv</a>
-        </div>
-        <h3>Id, First Name, Last Name, Street Address, Zip, Phone, Email, Status</h2>
-        <div id="log-body"></div>
-        <script>
-            var ws = new WebSocket("ws://http://159.89.92.12:8000/ws");
-            ws.onmessage = function(event) {
-                var messages = document.getElementById('log-body')
-                var content = document.createTextNode(event.data)
-                messages.innerHTML = content.textContent
-            };
-             setInterval(() => ws.send('DataRequest'), 100)
-        </script>
-    </body>
-</html>
-"""
-
 
 
 
 @app.get("/")
 async def get():
-	return HTMLResponse(html)
+    return HTMLResponse(percent_html)
+
+@app.websocket("/percent")
+async def websocket_endpoint(websocket: WebSocket):
+	await websocket.accept()
+	while True:
+		try:
+			data = await websocket.receive_text()
+			int(data)
+			open("percantage.txt", "w").write(data)
+			await websocket.send_text(f"Click T&S percentage updated to: {data}")
+		except ValueError:
+			await websocket.send_text("Invalid Input! Make sure not to include any letters or symbols.")
+				
+
+
+@app.get("/log")
+async def get():
+	return HTMLResponse(log_html)
 
 
 @app.websocket("/ws")

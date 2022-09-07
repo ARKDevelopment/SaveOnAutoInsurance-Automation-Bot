@@ -2,6 +2,67 @@ import re
 import requests
 
 
+percent_html = """
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Percentage</title>
+    </head>
+    <body>
+        <h1>Percentage Changer</h1>
+        <form action="" onsubmit="sendMessage(event)">
+            <input type="text" id="messageText" autocomplete="off"/>
+            <button>Send</button>
+        </form>
+        <ul id='messages'>
+        </ul>
+        <script>
+            var ws = new WebSocket("ws://159.89.92.12:8000/percent");
+            ws.onmessage = function(event) {
+                var messages = document.getElementById('messages')
+                var message = document.createElement('li')
+                var content = document.createTextNode(event.data)
+                message.appendChild(content)
+                messages.appendChild(message)
+            };
+            function sendMessage(event) {
+                var input = document.getElementById("messageText")
+                ws.send(input.value)
+                input.value = ''
+                event.preventDefault()
+            }
+        </script>
+    </body>
+</html>
+"""
+
+log_html = """
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Logs</title>
+    </head>
+    <body>
+        <div>
+        <a href='/download' style='float:right'>Download csv</a>
+        </div>
+        <h3>Id, First Name, Last Name, Street Address, Zip, Phone, Email, Status</h2>
+        <div id="log-body"></div>
+        <script>
+            var ws = new WebSocket("ws://http://159.89.92.12:8000/ws");
+            ws.onmessage = function(event) {
+                var messages = document.getElementById('log-body')
+                var content = document.createTextNode(event.data)
+                messages.innerHTML = content.textContent
+            };
+             setInterval(() => ws.send('DataRequest'), 100)
+        </script>
+    </body>
+</html>
+"""
+
+
+
 def ziptostate(zip):
   req = requests.get(f"https://api.zippopotam.us/us/{zip}").text
   return eval(req)["places"][0]
