@@ -49,7 +49,7 @@ log_html = """
         <h3>Id, First Name, Last Name, Street Address, Zip, Phone, Email, Status</h2>
         <div id="log-body"></div>
         <script>
-            var ws = new WebSocket("ws://http://159.89.92.12:8000/ws");
+            var ws = new WebSocket("ws://159.89.92.12:8000/ws");
             ws.onmessage = function(event) {
                 var messages = document.getElementById('log-body')
                 var content = document.createTextNode(event.data)
