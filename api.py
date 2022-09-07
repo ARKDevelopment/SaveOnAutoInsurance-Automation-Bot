@@ -1,10 +1,9 @@
-import csv
-from fastapi import FastAPI, WebSocket
+import csv, sqlite3, uuid
+from fastapi import FastAPI, WebSocket, HTTPException
 from fastapi.responses import HTMLResponse
 from starlette.responses import FileResponse
 from pydantic import BaseModel
-import sqlite3
-import uuid
+from components import proxy_test
 
 
 app = FastAPI()
@@ -51,7 +50,7 @@ html = """
         <h3>Id, First Name, Last Name, Street Address, Zip, Phone, Email, Status</h2>
         <div id="log-body"></div>
         <script>
-            var ws = new WebSocket("ws://159.89.92.12:8000/ws");
+            var ws = new WebSocket("ws://http://127.0.0.1:9000/ws");
             ws.onmessage = function(event) {
                 var messages = document.getElementById('log-body')
                 var content = document.createTextNode(event.data)
@@ -62,6 +61,8 @@ html = """
     </body>
 </html>
 """
+
+
 
 
 @app.get("/")
@@ -121,7 +122,11 @@ async def automate(auto_insurance: AutoInsurance):
         
   con.commit()
   con.close()
-  return auto_insurance
+  try:
+    proxy_test(auto_insurance.city, auto_insurance.zipp)
+  except Exception as e:
+    raise HTTPException(status_code=404, detail=str(e))
+  return idd
 
 @app.get('/download')
 def download_as_csv():
