@@ -1,6 +1,4 @@
 import requests
-from bs4  import BeautifulSoup
-from proxy_checker import ProxyChecker
 
 
 def ziptostate(zip):
