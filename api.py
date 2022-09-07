@@ -91,15 +91,15 @@ def queued():
 @app.post('/add-to-queue')
 async def automate(auto_insurance: AutoInsurance):
   if len(auto_insurance.zipp.strip()) != 5:
-     raise HTTPException(status_code=400, detail="Invalid Zip Code")
+    raise HTTPException(status_code=400, detail="Invalid Zip Code")
 	
   if not email_verified(auto_insurance.email):
-     raise HTTPException(status_code=400, detail="Invalid email address")
+    raise HTTPException(status_code=400, detail="Invalid email address")
 
-  # try:
-  #   proxy_test(auto_insurance.city, auto_insurance.zipp)
-  # except Exception as e:
-  #   raise HTTPException(status_code=400, detail=str(e))
+  try:
+    proxy_test(auto_insurance.city, auto_insurance.zipp)
+  except Exception as e:
+    raise HTTPException(status_code=400, detail="No proxies available for this zip code")
 
 
   idd = str(uuid.uuid4())
