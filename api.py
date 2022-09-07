@@ -97,6 +97,11 @@ def queued():
 
 @app.post('/add-to-queue')
 async def automate(auto_insurance: AutoInsurance):
+  try:
+    proxy_test(auto_insurance.city, auto_insurance.zipp)
+  except Exception as e:
+    raise HTTPException(status_code=404, detail=str(e))
+
   idd = str(uuid.uuid4())
   con = sqlite3.connect('autoinsurance.db')
   cur = con.cursor()
@@ -122,10 +127,6 @@ async def automate(auto_insurance: AutoInsurance):
         
   con.commit()
   con.close()
-  try:
-    proxy_test(auto_insurance.city, auto_insurance.zipp)
-  except Exception as e:
-    raise HTTPException(status_code=404, detail=str(e))
   return idd
 
 @app.get('/download')
