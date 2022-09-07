@@ -1,3 +1,4 @@
+import re
 import requests
 
 
@@ -6,6 +7,10 @@ def ziptostate(zip):
   return eval(req)["places"][0]
 
 
+def email_verified(email):
+  if re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", email):
+    return True
+  return False
 
 
 def proxy_test(city, zipp):
@@ -13,9 +18,6 @@ def proxy_test(city, zipp):
       state = ziptostate(zipp)["state"].lower().replace(" ", "+")
   except KeyError:
       raise Exception("Invalid zip code")
-
-      
-
 
   try:
       # city = city.lower().replace(" ", "+")
@@ -37,4 +39,5 @@ def proxy_test(city, zipp):
 
 
 if  "__main__" == __name__:
-  print(proxy_test("New Yordfdfk", "10001"))
+  print(email_verified("kfjdsljf@kdjf.com"))
+  # print(proxy_test("New Yordfdfk", "10001"))

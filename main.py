@@ -1,7 +1,6 @@
-import asyncio
-import json
-import random, datetime, requests
+import asyncio, random, datetime, requests, json
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError 
+from components import proxy_test
 
 first_name  = "Hector"
 last_name   = "Hector"
@@ -69,11 +68,13 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     state = ziptostate(zipp)
     state.lower().replace(" ", "+")
     city = city.lower().replace(" ", "+")
-    browser = await emulated_browser(p, proxy={
-      'server': 'proxy.froxy.com:9000',
-      'username': 'XLdek13TDI94zkFC',
-      'password': f'wifi;us;;{state};{city}',
-      })
+    browser = await emulated_browser(p, 
+      proxy={
+        'server': 'proxy.froxy.com:9000',
+        'username': 'XLdek13TDI94zkFC',
+        'password': proxy_test(city, zipp),
+      }
+    )
     # return [x for x in range(9)]
     page = await browser.new_page()
     try:

@@ -40,7 +40,7 @@ async def sql_delete(item):
 
     # Inserting into log and making random data unknown
     cur.execute("INSERT INTO log (id, first_name, last_name, street_address, zip, phone, email, year, make, model, insuredform, dob, gender, device, education, rating, status) VAlUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
-                                  (item[0],item[1],item[2],item[3],item[5],item[6],item[7], "?", "?", "?", "?", "?", "?", "?", "?", "?", 'queued'))
+                                  (item[0],item[1],item[2],item[3],item[5],item[6],item[7], "?", "?", "?", "?", "?", "?", "?", "?", "?", 'running'))
     conn.commit()
 
     random_values = await main(*list(item[1:]))
