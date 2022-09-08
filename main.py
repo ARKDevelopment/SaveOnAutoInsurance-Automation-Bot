@@ -81,7 +81,7 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     # return [x for x in range(9)]
     page = await browser.new_page()
     try:
-      await page.goto("https://auto.saveonautoinsurance.us/", timeout=60000)
+      await page.goto("http://autoins.saveonautoinsurance.us/", timeout=60000)
     except PlaywrightTimeoutError:
       await page.wait_for_selector('#year', timeout=60000)
 
