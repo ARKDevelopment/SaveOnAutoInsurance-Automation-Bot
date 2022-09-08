@@ -2,15 +2,13 @@ import asyncio, random, datetime, requests, json
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError 
 from components import proxy_test
 
-first_name  = "Hector"
-last_name   = "Hector"
-street_address = "1234 Main St"
-zipp = "10005"
-phone = "1234567890"
-email = "heck@tor.com"
+# first_name  = "Hector"
+# last_name   = "Hector"
+# street_address = "1234 Main St"
+# zipp = "10005"
+# phone = "1234567890"
+# email = "heck@tor.com"
 
-PERCENT = 50
-percent = int(open("percantage.txt", "r").read())
 
 
 def genderize(name):
@@ -24,19 +22,26 @@ def ziptostate(zip):
 
 def playwright_devices():
   req = requests.get("https://raw.githubusercontent.com/microsoft/playwright/main/packages/playwright-core/src/server/deviceDescriptorsSource.json").text
-  return json.loads(req)
+  return open("devices.txt").read().split("\n"), json.loads(req)
 
 async def emulated_browser(playwright, proxy=None):
   playwright_device_list = playwright_devices()
-  device_list = [x for x in playwright_device_list if x.split(" ")[-1] != "landscape"]
+  device_list = playwright_device_list[0]
+
   global random_device
   random_device = random.choice(device_list)
+  # random_device = device_list[9]
   print(random_device)
+  
   device = playwright.devices[random_device]
-  browser = await playwright.chromium.launch(headless=False)
-  # browser = await playwright[playwright_device_list[random_device]["defaultBrowserType"]].launch(headless=False)
+  device.pop("viewport")
+  # print(device)
+  # browser = await playwright.chromium.launch(headless=False)
+  browser = await playwright[playwright_device_list[1][random_device]["defaultBrowserType"]].launch(headless=False)
+  
   return await browser.new_context(**device, 
-    proxy={**proxy} if proxy else None
+    proxy={**proxy},
+    viewport={"width": 800, "height": 900}
   )
   
 
@@ -48,9 +53,10 @@ async def random_selector(page, selector):
   await page.select_option(selector, item)
   return item
 
+
 async def scroller(page, wait):
   while wait > 0:
-      print(wait)
+      # print(wait)
       about_us = await page.query_selector('[data-id="475a35b7"]')
       await about_us.scroll_into_view_if_needed()
       rem = random.randint(2000, 5000)
@@ -82,6 +88,8 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     wait = random.randint(20000, 120000)
     
     year = random.randint(2012, int(datetime.datetime.today().year))
+    yr = await page.query_selector('#year')
+    await yr.scroll_into_view_if_needed()
     await page.select_option('#year', str(year))
     await page.evaluate('loadVehiclMakes()')
     await page.wait_for_timeout(random.randint(1000, 2000))
@@ -98,7 +106,11 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
 
     await page.check('#leadid_tcpa_disclosure')
 
-    tm = random.choice([False * 100-percent, True * percent])
+    percent = int(open("percantage.txt", "r").read())
+    false_array = [False] * (100-percent)
+    true_array = [True] * percent
+    tm = random.choice(false_array + true_array)
+    # print(tm)
     if tm:
       page2 = await browser.new_page()
       await page2.goto('https://auto.saveonautoinsurance.us/terms.html', timeout=60000)
@@ -116,6 +128,7 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     await page.click('#submit')
 
     #PAGE 2
+    print("PAGE 2")
     await page.wait_for_timeout(random.randint(1000, 2000))
 
     await page.type('#firstname', first_name, delay=random.randint(20, 120))
@@ -159,6 +172,7 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     
 
     #Part 2
+    print("Part 2")
     education = await random_selector(page, '#education')
     await page.wait_for_timeout(random.randint(1000, 2000))
 

@@ -100,5 +100,5 @@ def proxy_test(city, zipp):
 
 
 if  "__main__" == __name__:
-  print(email_verified("kfjdsljf@kdjf.com"))
-  # print(proxy_test("New Yordfdfk", "10001"))
+#   print(email_verified("kfjdsljf@kdjf.com"))
+  print(proxy_test("New rochelle", "10801"))
