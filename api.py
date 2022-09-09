@@ -89,20 +89,19 @@ def queued():
 
 @app.post('/add-to-queue')
 async def automate(auto_insurance: AutoInsurance):
-    if len(auto_insurance.zipp.strip()) != 5:
-        return {"ERORR 400": "Invalid Zip Code!"}
-    # raise HTTPException(status_code=400, detail="Invalid Zip Code")
-    
     if not email_verified(auto_insurance.email): 
         return "ERORR 400: Invalid Email!"
         # raise HTTPException(status_code=400, detail="Invalid email address")
+
+    if len(auto_insurance.zipp.strip()) != 5:
+        return {"ERORR 400": "Invalid Zip Code!"}
+    # raise HTTPException(status_code=400, detail="Invalid Zip Code")    
 
     try:
         proxy_test(auto_insurance.city, auto_insurance.zipp)
     except Exception as e:
         return f"ERORR 400: {e}"
-        # raise HTTPException(
-        #     status_code=400, detail="No proxies available for this zip code")
+        # raise HTTPException(status_code=400, detail="No proxies available for this zip code")
 
     idd = str(uuid.uuid4())
     con = sqlite3.connect('autoinsurance.db')

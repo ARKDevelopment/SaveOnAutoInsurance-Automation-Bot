@@ -33,15 +33,15 @@ async def emulated_browser(playwright, proxy=None):
   # random_device = device_list[9]
   print(random_device)
   
-  device = playwright.devices[random_device]
-  device.pop("viewport")
+  device = playwright.devices["Desktop Chrome"]
+  # device.pop("viewport")
   # print(device)
-  # browser = await playwright.chromium.launch(headless=False)
-  browser = await playwright[playwright_device_list[1][random_device]["defaultBrowserType"]].launch(headless=False)
+  browser = await playwright.chromium.launch(headless=False)
+  # browser = await playwright[playwright_device_list[1][random_device]["defaultBrowserType"]].launch(headless=False)
   
   return await browser.new_context(**device, 
-    proxy={**proxy},
-    viewport={"width": 800, "height": 900}
+    proxy={**proxy} if proxy else None,
+    # viewport={"width": 800, "height": 900}
   )
   
 
@@ -73,19 +73,21 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
   async with async_playwright() as p:
     browser = await emulated_browser(p, 
       proxy={
-        'server': 'proxy.froxy.com:9000',
-        'username': 'XLdek13TDI94zkFC',
-        'password': proxy_test(city, zipp),
+        'server': 'p.webshare.io:80',
+        'username': 'ytdxlpex-rotate',
+        'password': 'p5q0cxr3pvt4',
       }
     )
     # return [x for x in range(9)]
+
     page = await browser.new_page()
     try:
-      await page.goto("https://auto.saveonautoinsurance.us/", timeout=60000)
+      await page.goto("http://autoins.saveonautoinsurance.us/", timeout=60000)
     except PlaywrightTimeoutError:
       await page.wait_for_selector('#year', timeout=60000)
+    input("Press Enter to continue...")
 
-    wait = random.randint(20000, 120000)
+    wait = random.randint(2000, 10000)#, 120000)
     
     year = random.randint(2012, int(datetime.datetime.today().year))
     yr = await page.query_selector('#year')
@@ -103,6 +105,7 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     await page.wait_for_timeout(random.randint(1000, 2000))
 
     insuredform = await random_selector(page, '#insuredform')
+    # await page.evaluate('changeError()')
 
     await page.check('#leadid_tcpa_disclosure')
 
@@ -125,7 +128,7 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
       await page2.close()
 
     await scroller(page, wait)
-    await page.click('#submit')
+    await page.click('#submit', force=True)
 
     #PAGE 2
     print("PAGE 2")
@@ -140,8 +143,8 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     dob = "/".join(map(str, [random.randint(1,12),random.randint(1, 28),int(datetime.datetime.today().year) - random.randint(23, 61)]))
     await page.type('#dateofbirth', dob, delay=random.randint(90, 200))
     await page.wait_for_timeout(random.randint(1000, 2000))
-    await page.click('.ui-state-active')
-    await page.wait_for_timeout(random.randint(1000, 2000))
+    # await page.click('.ui-state-active')
+    # await page.wait_for_timeout(random.randint(1000, 2000))
 
     gender = genderize(first_name)
     await page.select_option('#gender', gender)
@@ -203,6 +206,6 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
 
 if __name__ == "__main__":
   # proxy_test()
-  asyncio.run(main(first_name="keyla", last_name="Doe", street_address="123 Main St", city="new york", zipp="10005", phone="1234567890", email="flkflkf@lkdf.dmm"))
+  asyncio.run(main(first_name="keyla", last_name="Doe", street_address="123 Main St", city="new york", zipp="54545", phone="1234567890", email="flkflkf@lkdf.dmm"))
   # print(playwright_devices())
   # print(genderize('John'))
