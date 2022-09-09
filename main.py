@@ -2,14 +2,6 @@ import asyncio, random, datetime, requests, json
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError 
 from components import proxy_test
 
-# first_name  = "Hector"
-# last_name   = "Hector"
-# street_address = "1234 Main St"
-# zipp = "10005"
-# phone = "1234567890"
-# email = "heck@tor.com"
-
-
 
 def genderize(name):
   req = requests.get(f"https://api.genderize.io/?name={name}").text
@@ -34,10 +26,10 @@ async def emulated_browser(playwright, proxy=None):
   print(random_device)
   
   device = playwright.devices["Desktop Chrome"]
-  # device.pop("viewport")
+  device.pop("viewport")
   # print(device)
-  browser = await playwright.chromium.launch(headless=False)
-  # browser = await playwright[playwright_device_list[1][random_device]["defaultBrowserType"]].launch(headless=False)
+  # browser = await playwright.chromium.launch(headless=False)
+  browser = await playwright[playwright_device_list[1][random_device]["defaultBrowserType"]].launch(headless=False)
   
   return await browser.new_context(**device, 
     proxy={**proxy} if proxy else None,
@@ -105,7 +97,6 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     await page.wait_for_timeout(random.randint(1000, 2000))
 
     insuredform = await random_selector(page, '#insuredform')
-    # await page.evaluate('changeError()')
 
     await page.check('#leadid_tcpa_disclosure')
 
