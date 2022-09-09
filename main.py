@@ -77,7 +77,6 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
       await page.goto("http://autoins.saveonautoinsurance.us/", timeout=60000)
     except PlaywrightTimeoutError:
       await page.wait_for_selector('#year', timeout=60000)
-    input("Press Enter to continue...")
 
     wait = random.randint(2000, 10000)#, 120000)
     
