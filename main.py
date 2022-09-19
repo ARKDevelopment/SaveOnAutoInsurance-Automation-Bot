@@ -28,8 +28,8 @@ async def emulated_browser(playwright, proxy=None):
   device = playwright.devices["Desktop Chrome"]
   device.pop("viewport")
   # print(device)
-  # browser = await playwright.chromium.launch(headless=False)
-  browser = await playwright[playwright_device_list[1][random_device]["defaultBrowserType"]].launch(headless=False)
+  browser = await playwright.chromium.launch(headless=False)
+  # browser = await playwright[playwright_device_list[1][random_device]["defaultBrowserType"]].launch(headless=False)
   
   return await browser.new_context(**device, 
     proxy={**proxy} if proxy else None,
@@ -64,22 +64,46 @@ async def scroller(page, wait):
 async def main(first_name, last_name, street_address, city, zipp, phone, email):
   async with async_playwright() as p:
     browser = await emulated_browser(p, 
+      # proxy={
+      #   'server': 'p.webshare.io:80',
+      #   'username': 'ytdxlpex-rotate',
+      #   'password': 'p5q0cxr3pvt4',
+      # }
       proxy={
-        'server': 'p.webshare.io:80',
-        'username': 'ytdxlpex-rotate',
-        'password': 'p5q0cxr3pvt4',
+        'server': 'proxy.froxy.com:9000',
+        'username': 'XLdek13TDI94zkFC',
+        'password': proxy_test(city, zipp),
       }
     )
     # return [x for x in range(9)]
 
     page = await browser.new_page()
-    try:
-      await page.goto("http://autoins.saveonautoinsurance.us/", timeout=60000)
-    except PlaywrightTimeoutError:
-      await page.wait_for_selector('#year', timeout=60000)
+    await page.goto("http://auto.saveyourinsurance.com/")
+    # await page.goto("http://ifconfig.me/")
+
+    await page.wait_for_selector('#year')
 
     wait = random.randint(2000, 10000)#, 120000)
-    
+
+    percent = int(open("percantage.txt", "r").read())
+    false_array = [False] * (100-percent)
+    true_array = [True] * percent
+    tm = random.choice(false_array + true_array)
+    if tm:
+      page2 = await browser.new_page()
+      await page2.goto('http://auto.saveyourinsurance.com//terms.html', timeout=60000)
+      ps = await page2.query_selector_all('p')
+      for p in ps:
+        if wait < 1:
+          break
+        await p.scroll_into_view_if_needed()
+        rem = random.randint(2000, 3000)
+        await page.wait_for_timeout(rem)
+        wait -= rem
+      await page2.close()
+
+    await scroller(page, wait)
+
     year = random.randint(2012, int(datetime.datetime.today().year))
     yr = await page.query_selector('#year')
     await yr.scroll_into_view_if_needed()
@@ -98,27 +122,7 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     insuredform = await random_selector(page, '#insuredform')
 
     await page.check('#leadid_tcpa_disclosure')
-
-    percent = int(open("percantage.txt", "r").read())
-    false_array = [False] * (100-percent)
-    true_array = [True] * percent
-    tm = random.choice(false_array + true_array)
-    # print(tm)
-    if tm:
-      page2 = await browser.new_page()
-      await page2.goto('https://auto.saveonautoinsurance.us/terms.html', timeout=60000)
-      ps = await page2.query_selector_all('p')
-      for p in ps:
-        if wait < 1:
-          break
-        await p.scroll_into_view_if_needed()
-        rem = random.randint(2000, 3000)
-        await page.wait_for_timeout(rem)
-        wait -= rem
-      await page2.close()
-
-    await scroller(page, wait)
-    await page.click('#submit', force=True)
+    await page.click('#submit')
 
     #PAGE 2
     print("PAGE 2")
@@ -182,7 +186,7 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     await page.wait_for_timeout(random.randint(1000, 2000))
 
 
-    submit_button = await page.query_selector('#submit')
+    submit_button = await page.query_selector('#submit >> nth=1')
     await submit_button.scroll_into_view_if_needed()
     await page.wait_for_timeout(random.randint(2000, 5000))
     await submit_button.click()
