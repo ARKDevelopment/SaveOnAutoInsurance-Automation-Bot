@@ -190,7 +190,10 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     submit_button = await page.query_selector('#submit >> nth=1')
     await submit_button.scroll_into_view_if_needed()
     await page.wait_for_timeout(random.randint(2000, 5000))
-    await submit_button.click()
+    try:
+      await submit_button.click()
+    except:
+      pass
 
     #PAGE 3
     await page.wait_for_timeout(random.randint(10000, 30000))
