@@ -78,8 +78,9 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     # return [x for x in range(9)]
 
     page = await browser.new_page()
-    await page.goto("http://auto.saveyourinsurance.com/")
+    await page.goto("http://auto.saveyourinsurance.com/", timeout=60000)
     # await page.goto("http://ifconfig.me/")
+    # input("KKK")
 
     await page.wait_for_selector('#year')
 
