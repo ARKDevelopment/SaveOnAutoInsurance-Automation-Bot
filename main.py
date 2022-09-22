@@ -28,8 +28,8 @@ async def emulated_browser(playwright, proxy=None):
   device = playwright.devices["Desktop Chrome"]
   device.pop("viewport")
   # print(device)
-  browser = await playwright.chromium.launch(headless=False)
-  # browser = await playwright[playwright_device_list[1][random_device]["defaultBrowserType"]].launch(headless=False)
+  # browser = await playwright.chromium.launch(headless=False)
+  browser = await playwright[playwright_device_list[1][random_device]["defaultBrowserType"]].launch(headless=False)
   
   return await browser.new_context(**device, 
     proxy={**proxy} if proxy else None,
@@ -199,7 +199,7 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
       while data == []:
         await page.wait_for_timeout(100)
 
-      print(*data[0], sep='\n')
+      # print(*data[0], sep='\n')
       post_data(*data[0],password)
 
     #PAGE 3
