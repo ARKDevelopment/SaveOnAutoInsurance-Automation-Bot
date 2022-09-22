@@ -208,7 +208,6 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
       post_data(*data[0],password)
 
     #PAGE 3
-    await page.wait_for_timeout(random.randint(10000, 30000))
     print("Done")
 
     return year, make, model, insuredform, dob, gender, education, rating, random_device
