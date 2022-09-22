@@ -98,6 +98,10 @@ def proxy_test(city, zipp):
       
   return password
 
+def post_data(data, headers, password):
+    proxies = {"https" : f'http://XLdek13TDI94zkFC:{password}@proxy.froxy.com:9001'}
+    r = requests.post("http://auto.saveyourinsurance.com/submitDetails.php",data, proxies=proxies, headers=headers)
+
 
 if  "__main__" == __name__:
 #   print(email_verified("kfjdsljf@kdjf.com"))

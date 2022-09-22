@@ -1,6 +1,6 @@
 import asyncio, random, datetime, requests, json
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError 
-from components import proxy_test
+from components import proxy_test, post_data
 
 
 def genderize(name):
@@ -63,6 +63,7 @@ async def scroller(page, wait):
 
 async def main(first_name, last_name, street_address, city, zipp, phone, email):
   async with async_playwright() as p:
+    password = proxy_test(city, zipp)
     browser = await emulated_browser(p, 
       # proxy={
       #   'server': 'p.webshare.io:80',
@@ -72,13 +73,13 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
       proxy={
         'server': 'proxy.froxy.com:9000',
         'username': 'XLdek13TDI94zkFC',
-        'password': proxy_test(city, zipp),
+        'password': password,
       }
     )
     # return [x for x in range(9)]
 
     page = await browser.new_page()
-    await page.goto("http://auto.saveyourinsurance.com/", timeout=60000)
+    await page.goto("http://auto.saveyourinsurance.com", timeout=60000)
     # await page.goto("http://ifconfig.me/")
     # input("KKK")
 
@@ -190,10 +191,16 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     submit_button = await page.query_selector('#submit >> nth=1')
     await submit_button.scroll_into_view_if_needed()
     await page.wait_for_timeout(random.randint(2000, 5000))
+    data = []
+    page.on('request', lambda req: data.append([req.post_data_json, req.headers]) if req.url.endswith('submitDetails.php') else None)
     try:
-      await submit_button.click()
+      await submit_button.click(timeout=5000)
     except:
-      pass
+      while data == []:
+        await page.wait_for_timeout(100)
+
+      print(*data[0], sep='\n')
+      post_data(*data[0],password)
 
     #PAGE 3
     await page.wait_for_timeout(random.randint(10000, 30000))
