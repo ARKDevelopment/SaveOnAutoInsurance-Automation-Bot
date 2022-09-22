@@ -25,9 +25,10 @@ async def emulated_browser(playwright, proxy=None):
   # random_device = device_list[9]
   print(random_device)
   
-  device = playwright.devices["Desktop Chrome"]
-  device.pop("viewport")
+  device = playwright.devices[random_device]
+  # device.pop("viewport")
   # print(device)
+  # system = 
   # browser = await playwright.chromium.launch(headless=False)
   browser = await playwright[playwright_device_list[1][random_device]["defaultBrowserType"]].launch(headless=False)
   
