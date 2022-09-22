@@ -7,6 +7,7 @@ def genderize(name):
   req = requests.get(f"https://api.genderize.io/?name={name}").text
   return eval(req)["gender"].title()
 
+
 def ziptostate(zip):
   req = requests.get(f"https://api.zippopotam.us/us/{zip}").text
   return eval(req)["places"][0]["state"]
@@ -143,7 +144,10 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     # await page.click('.ui-state-active')
     # await page.wait_for_timeout(random.randint(1000, 2000))
 
-    gender = genderize(first_name)
+    try:
+      gender = genderize(first_name)
+    except NameError:
+      gender = "Male"
     await page.select_option('#gender', gender)
     await page.wait_for_timeout(random.randint(1000, 2000))
 
@@ -211,7 +215,6 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
 
 
 if __name__ == "__main__":
-  # proxy_test()
-  asyncio.run(main(first_name="keyla", last_name="Doe", street_address="123 Main St", city="new york", zipp="54545", phone="1234567890", email="flkflkf@lkdf.dmm"))
+  asyncio.run(main(first_name="testGreen", last_name="testG", street_address="test", city="test", zipp="85306", phone="8545214523", email="ds45s@gmail.com"))
   # print(playwright_devices())
   # print(genderize('John'))
