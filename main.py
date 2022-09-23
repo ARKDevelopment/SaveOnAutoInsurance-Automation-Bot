@@ -199,7 +199,7 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     data = []
     page.on('request', lambda req: data.append([req.post_data_json, req.headers]) if req.url.endswith('submitDetails.php') else None)
     try:
-      await submit_button.click(timeout=5000)
+      await submit_button.click()
     except:
       while data == []:
         await page.wait_for_timeout(100)
