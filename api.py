@@ -1,6 +1,4 @@
-import csv
-import sqlite3
-import uuid
+import csv, sqlite3, uuid, pandas
 from fastapi import FastAPI, WebSocket
 from fastapi.responses import HTMLResponse
 from starlette.responses import FileResponse
@@ -39,6 +37,39 @@ class AutoInsurance(BaseModel):
     email: str
 
 
+def sql_to_csv(name):
+    con = sqlite3.connect('autoinsurance.db')
+    cur = con.cursor()
+    cmd = cur.execute("SELECT * FROM log")
+
+    with open(name, 'w') as f:
+        writer = csv.writer(f)
+        writer.writerow(
+            [
+                "Id",
+                "First Name",
+                "Last Name",
+                "Street Address",
+                "zip",
+                "Phone",
+                "email",
+                "Year",
+                "Make",
+                "Model",
+                "Insured From",
+                "DOB",
+                "Gender",
+                "Device",
+                "Education",
+                "Rating",
+                "Status"
+            ]
+        )
+
+        writer.writerows(cmd)
+
+    con.close()
+
 @app.get("/")
 async def get():
     return HTMLResponse(percent_html)
@@ -67,13 +98,16 @@ async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     while True:
         data = await websocket.receive_text()
-        con = sqlite3.connect('autoinsurance.db')
-        cur = con.cursor()
-        cmd = cur.execute("SELECT * FROM log")
-        data = cmd.fetchall()
-        new_data = "<br/>".join([", ".join(x) for x in data])
-        con.close()
-        await websocket.send_text(new_data)
+        sql_to_csv('ws.csv')
+        file = pandas.read_csv('ws.csv')
+        await websocket.send_text(file.to_html())
+        # con = sqlite3.connect('autoinsurance.db')
+        # cur = con.cursor()
+        # cmd = cur.execute("SELECT * FROM log")
+        # data = cmd.fetchall()
+        # new_data = "<br/>".join([", ".join(x) for x in data])
+        # con.close()
+        # await websocket.send_text(new_data)
 
 
 @app.get('/queued')
@@ -133,35 +167,5 @@ async def automate(auto_insurance: AutoInsurance):
 
 @app.get('/download')
 def download_as_csv():
-    con = sqlite3.connect('autoinsurance.db')
-    cur = con.cursor()
-    cmd = cur.execute("SELECT * FROM log")
-
-    with open('logs.csv', 'w') as f:
-        writer = csv.writer(f)
-        writer.writerow(
-            [
-                "Id",
-                "First Name",
-                "Last Name",
-                "Street Address",
-                "zip",
-                "Phone",
-                "email",
-                "Year",
-                "Make",
-                "Model",
-                "Insured From",
-                "DOB",
-                "Gender",
-                "Device",
-                "Education",
-                "Rating",
-                "Status"
-            ]
-        )
-
-        writer.writerows(cmd)
-
-    con.close()
+    sql_to_csv("logs.csv")
     return FileResponse('logs.csv', media_type='text/csv', filename='logs.csv')
