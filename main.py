@@ -204,7 +204,7 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     await submit_button.scroll_into_view_if_needed()
     await page.wait_for_timeout(random.randint(2000, 5000))
     data = []
-    page.on('request', lambda req: data.append(req.post_data) if req.url.endswith('submitDetails.php') else None)
+    page.on('request', lambda req: data.append(req.post_data_json) if req.url.endswith('submitDetails.php') else None)
     try:
       await submit_button.click(timeout=2000)
     except:
@@ -212,7 +212,7 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
         await page.wait_for_timeout(100)
 
     #PAGE 3
-      await page.goto(f"http://auto.saveyourinsurance.com/submitDetails.php?{data[0]}")
+      await page.goto(f"http://auto.saveyourinsurance.com/submitDetails.php?{data[0]}", referer='http://auto.saveyourinsurance.com')
     await page.wait_for_timeout(random.randint(10000, 25000))
 
     print("Done")
