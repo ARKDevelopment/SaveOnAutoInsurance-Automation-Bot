@@ -95,7 +95,7 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     tm = random.choice(false_array + true_array)
     if tm:
       page2 = await browser.new_page()
-      await page2.goto('http://auto.saveyourinsurance.com//terms.html', timeout=60000)
+      await page2.goto('http://auto.saveyourinsurance.com/terms.html', timeout=60000)
       ps = await page2.query_selector_all('p')
       for p in ps:
         if wait < 1:
@@ -137,8 +137,15 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
 
     await page.type('#lastname', last_name, delay=random.randint(20, 120))
     await page.wait_for_timeout(random.randint(1000, 2000))
+    
+    month = random.randint(1,12)
+    month = month if len(str(month)) > 1 else f"0{month}"
 
-    dob = "/".join(map(str, [random.randint(1,12),random.randint(1, 28),int(datetime.datetime.today().year) - random.randint(23, 61)]))
+    day = random.randint(1,28)
+    day = day if len(str(day)) > 1 else f"0{day}"
+
+    year = int(datetime.datetime.today().year) - random.randint(23, 61)
+    dob = "/".join(map(str, [month,day,year]))
     await page.type('#dateofbirth', dob, delay=random.randint(90, 200))
     await page.wait_for_timeout(random.randint(1000, 2000))
     # await page.click('.ui-state-active')
@@ -197,17 +204,17 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     await submit_button.scroll_into_view_if_needed()
     await page.wait_for_timeout(random.randint(2000, 5000))
     data = []
-    page.on('request', lambda req: data.append([req.post_data_json, req.headers]) if req.url.endswith('submitDetails.php') else None)
+    page.on('request', lambda req: data.append(req.post_data) if req.url.endswith('submitDetails.php') else None)
     try:
-      await submit_button.click()
+      await submit_button.click(timeout=2000)
     except:
       while data == []:
         await page.wait_for_timeout(100)
 
-      # print(*data[0], sep='\n')
-      post_data(*data[0],password)
-
     #PAGE 3
+      await page.goto(f"http://auto.saveyourinsurance.com/submitDetails.php?{data[0]}")
+    page.wait_for_timeout(random.randint(10000, 25000))
+
     print("Done")
 
     return year, make, model, insuredform, dob, gender, education, rating, random_device

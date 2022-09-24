@@ -46,7 +46,7 @@ log_html = """
         <div>
         <a href='/download' style='float:right'>Download csv</a>
         </div>
-        <h3>Id, First Name, Last Name, Street Address, Zip, Phone, Email, Status</h2>
+        <h3>Id, First Name, Last Name, Street Address, Zip, Phone, Email, Year, Make, Model, Insuredform, DOB, Gender, Education, Rating, Device, Status Status</h2>
         <div id="log-body"></div>
         <script>
             var ws = new WebSocket("ws://159.89.92.12:8000/ws");
