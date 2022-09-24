@@ -126,7 +126,7 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     insuredform = await random_selector(page, '#insuredform')
 
     await page.check('#leadid_tcpa_disclosure')
-    await page.click('#submit')
+    await page.click('#submit >> nth=0')
 
     #PAGE 2
     print("PAGE 2")
