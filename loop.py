@@ -68,7 +68,7 @@ async def sql_delete(item):
   
 
 async def main_loop():
-  comand = "python loop.py"
+  comand = "xvfb-run python3 loop.py"
   while True:
     cmd = cur.execute("SELECT * FROM queue").fetchall()
     queue_items = [x for x in cmd]
@@ -79,7 +79,7 @@ async def main_loop():
       exit(os.system(comand))
     elif len(queue_items) >= 5:
       await asyncio.gather(*[sql_delete(x) for x in queue_items[:5]])
-      exit(os.system("python loop.py"))
+      exit(os.system(comand))
 
 
 try:
