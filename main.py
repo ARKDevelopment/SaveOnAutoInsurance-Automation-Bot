@@ -66,26 +66,21 @@ async def scroller(page, wait):
 async def main(first_name, last_name, street_address, city, zipp, phone, email):
   async with async_playwright() as p:
     password = proxy_test(city, zipp)
-    browser = await emulated_browser(p, 
-      # proxy={
-      #   'server': 'p.webshare.io:80',
-      #   'username': 'ytdxlpex-rotate',
-      #   'password': 'p5q0cxr3pvt4',
-      # }
+    browser = await emulated_browser(
+      p, 
       proxy={
         'server': 'proxy.froxy.com:9000',
         'username': 'XLdek13TDI94zkFC',
         'password': password,
       }
     )
-    # return [x for x in range(9)]
 
     page = await browser.new_page()
     await page.goto("http://auto.saveyourinsurance.com")
     # await page.goto("http://ifconfig.me/")
-    # input("KKK")
 
-    await page.wait_for_selector('#year')
+    # await page.wait_for_selector('#year')
+    print("Page 1")
 
     wait = random.randint(2000, 10000)#, 120000)
 
@@ -148,9 +143,8 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     dob = "/".join(map(str, [month,day,year]))
     await page.type('#dateofbirth', dob, delay=random.randint(90, 200))
     await page.wait_for_timeout(random.randint(1000, 2000))
-    # await page.click('.ui-state-active')
-    # await page.wait_for_timeout(random.randint(1000, 2000))
 
+    
     try:
       gender = genderize(first_name)
     except NameError:
