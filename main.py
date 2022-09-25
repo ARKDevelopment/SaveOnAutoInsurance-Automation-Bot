@@ -90,7 +90,7 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     tm = random.choice(false_array + true_array)
     if tm:
       page2 = await browser.new_page()
-      await page2.goto('http://auto.saveyourinsurance.com/terms.html', timeout=60000)
+      await page2.goto('http://auto.saveyourinsurance.com/terms.html')
       ps = await page2.query_selector_all('p')
       for p in ps:
         if wait < 1:
@@ -144,7 +144,7 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     await page.type('#dateofbirth', dob, delay=random.randint(90, 200))
     await page.wait_for_timeout(random.randint(1000, 2000))
 
-    
+
     try:
       gender = genderize(first_name)
     except NameError:

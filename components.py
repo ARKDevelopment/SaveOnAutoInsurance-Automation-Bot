@@ -55,7 +55,7 @@ log_html = """
                 var content = document.createTextNode(event.data)
                 messages.innerHTML = content.textContent
             };
-             setInterval(() => ws.send('DataRequest'), 100)
+             setInterval(() => ws.send('DataRequest'), 500)
         </script>
     </body>
 </html>
