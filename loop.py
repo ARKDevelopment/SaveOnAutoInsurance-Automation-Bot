@@ -58,6 +58,7 @@ async def sql_delete(item):
     # Update log
     cur.execute("UPDATE log SET status = ? WHERE id = ?", ('success', idd,))
     conn.commit()
+    return True
     
   except Exception as e:
     # Update log if error
@@ -65,6 +66,7 @@ async def sql_delete(item):
     cur.execute("UPDATE log SET status = ? WHERE id = ?", (error_msg, idd))
     conn.commit()
     print(e)
+    return False
   
 
 async def main_loop():
@@ -78,8 +80,12 @@ async def main_loop():
     elif len(queue_items) >= 5:
       await asyncio.gather(*[sql_delete(x) for x in queue_items[:5]])
 
+    await asyncio.sleep(5)
+
 
 try:
-  asyncio.run(main_loop())
+  loop = asyncio.get_event_loop()
+  loop.run_until_complete(main_loop())
+  loop.close()
 except KeyboardInterrupt:
   exit()
