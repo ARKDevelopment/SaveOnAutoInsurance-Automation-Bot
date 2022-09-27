@@ -65,7 +65,7 @@ async def scroller(page, wait):
 
 async def main(first_name, last_name, street_address, city, zipp, phone, email):
   async with async_playwright() as p:
-    port = random.randint(9000, 9198)
+    port = random.randint(9000, 9008)
     password = proxy_test(city, zipp)
     browser = await emulated_browser(
       p, 

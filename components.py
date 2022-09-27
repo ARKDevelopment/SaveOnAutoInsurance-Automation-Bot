@@ -1,5 +1,7 @@
+import random
 import re
 import requests
+from requests_html import HTMLSession
 
 
 percent_html = """
@@ -75,8 +77,11 @@ def email_verified(email):
 
 
 def proxy_test(city, zipp):
+  port = str(random.randint(9010, 9015))
   try:
       state = ziptostate(zipp)["state"].lower().replace(" ", "+")
+      if state == "texas":
+          state = random.choice(["new+mexico", "oklahoma", "louisiana", "arkansas"])
   except KeyError:
       raise Exception("Invalid zip code")
 
@@ -85,13 +90,13 @@ def proxy_test(city, zipp):
       password = f'wifi;us;;{state};{city}'
       # password = 'wifi;us;;{state};'
       # print(password)
-      proxies = {"https" : f'http://XLdek13TDI94zkFC:{password}@proxy.froxy.com:9001'}
+      proxies = {"https" : f'http://XLdek13TDI94zkFC:{password}@proxy.froxy.com:{port}'}
       r = requests.get("https://api.ipify.org", proxies=proxies)
       # print(r.text)
   except requests.exceptions.ProxyError:
       try:
         password = f'wifi;us;;{state};'
-        proxies = {"https" : f'http://XLdek13TDI94zkFC:{password}@proxy.froxy.com:9001'}
+        proxies = {"https" : f'http://XLdek13TDI94zkFC:{password}@proxy.froxy.com:{port}'}
         r = requests.get("https://tools.keycdn.com", proxies=proxies)
       except requests.exceptions.ProxyError:
         raise Exception("No proxy available for this location")
@@ -99,8 +104,10 @@ def proxy_test(city, zipp):
   return password
 
 def post_data(data, headers, password):
+    req = HTMLSession()
+
     proxies = {"https" : f'http://XLdek13TDI94zkFC:{password}@proxy.froxy.com:9001'}
-    r = requests.post("http://auto.saveyourinsurance.com/submitDetails.php",data, proxies=proxies, headers=headers)
+    r = req.post("http://auto.saveyourinsurance.com/submitDetails.php",data, proxies=proxies, headers=headers)
 
 
 if  "__main__" == __name__:
