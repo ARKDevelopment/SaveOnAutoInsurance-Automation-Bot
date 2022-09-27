@@ -31,7 +31,7 @@ async def emulated_browser(playwright, proxy=None):
   # print(device)
   # system = 
   # browser = await playwright.chromium.launch(headless=False)
-  browser = await playwright[playwright_device_list[1][random_device]["defaultBrowserType"]].launch(headless=False)
+  browser = await playwright[playwright_device_list[1][random_device]["defaultBrowserType"]].launch()
   
   return await browser.new_context(**device, 
     proxy={**proxy} if proxy else None,
@@ -83,7 +83,7 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     # await page.wait_for_selector('#year')
     print("Page 1")
 
-    wait = random.randint(2000, 10000)#, 120000)
+    wait = random.randint(2000, 10000)
 
     percent = int(open("percantage.txt", "r").read())
     false_array = [False] * (100-percent)
