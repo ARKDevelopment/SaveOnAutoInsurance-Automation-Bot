@@ -65,11 +65,12 @@ async def scroller(page, wait):
 
 async def main(first_name, last_name, street_address, city, zipp, phone, email):
   async with async_playwright() as p:
+    port = random.randint(9000, 9198)
     password = proxy_test(city, zipp)
     browser = await emulated_browser(
       p, 
       proxy={
-        'server': 'proxy.froxy.com:9000',
+        'server': 'proxy.froxy.com:' + str(port),
         'username': 'XLdek13TDI94zkFC',
         'password': password,
       }
@@ -190,8 +191,8 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     await page.select_option('#married', "No")
     await page.wait_for_timeout(random.randint(1000, 2000))
 
-    await page.select_option('#tickets', "No")
-    await page.wait_for_timeout(random.randint(1000, 2000))
+    # await page.select_option('#tickets', "No")
+    # await page.wait_for_timeout(random.randint(1000, 2000))
 
 
     submit_button = await page.query_selector('#submit >> nth=1')
