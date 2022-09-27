@@ -1,4 +1,5 @@
 import os
+import time
 from uuid import uuid4
 from main import main
 import asyncio
@@ -69,23 +70,24 @@ async def sql_delete(item):
     return False
   
 
-async def main_loop():
+async def send_to_process(queue_items):
+  await asyncio.gather(*[sql_delete(x) for x in queue_items])
+
+def main_loop():
   while True:
     cmd = cur.execute("SELECT * FROM queue").fetchall()
     queue_items = [x for x in cmd]
 
     # Taking all from queue if less than 5 otherwise taking 5
     if len(queue_items) < 5 and len(queue_items) > 0:
-      await asyncio.gather(*[sql_delete(x) for x in queue_items])
+      asyncio.run(send_to_process(queue_items))
     elif len(queue_items) >= 5:
-      await asyncio.gather(*[sql_delete(x) for x in queue_items[:5]])
+      asyncio.run(send_to_process(queue_items[:5]))
 
-    await asyncio.sleep(5)
+    time.sleep(5)
 
-
-try:
-  loop = asyncio.get_event_loop()
-  loop.run_until_complete(main_loop())
-  loop.close()
-except KeyboardInterrupt:
-  exit()
+if __name__ == "__main__":
+  try:
+    main_loop()
+  except KeyboardInterrupt:
+    exit()
