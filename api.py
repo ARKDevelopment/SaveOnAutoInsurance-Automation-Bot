@@ -127,8 +127,10 @@ async def automate(auto_insurance: AutoInsurance):
         return "ERORR 400: Invalid Email!"
         # raise HTTPException(status_code=400, detail="Invalid email address")
 
-    if len(auto_insurance.zipp.strip()) != 5:
+    if len(auto_insurance.zipp.strip()) < 4 and len(auto_insurance.zipp.strip()) > 5:
         return {"ERORR 400": "Invalid Zip Code!"}
+    elif len(auto_insurance.zipp.strip()) == 4:
+        auto_insurance.zipp = "0" + auto_insurance.zipp.strip()
     # raise HTTPException(status_code=400, detail="Invalid Zip Code")    
 
     try:
