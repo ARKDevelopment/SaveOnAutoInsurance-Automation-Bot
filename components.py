@@ -1,7 +1,6 @@
 import random
 import re
 import requests
-from requests_html import HTMLSession
 
 
 percent_html = """
@@ -104,10 +103,8 @@ def proxy_test(city, zipp):
   return password
 
 def post_data(data, headers, password):
-    req = HTMLSession()
-
     proxies = {"https" : f'http://XLdek13TDI94zkFC:{password}@proxy.froxy.com:9001'}
-    r = req.post("http://auto.saveyourinsurance.com/submitDetails.php",data, proxies=proxies, headers=headers)
+    r = requests.post("http://auto.saveyourinsurance.com/submitDetails.php",data, proxies=proxies, headers=headers)
 
 
 if  "__main__" == __name__:
