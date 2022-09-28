@@ -31,7 +31,7 @@ async def emulated_browser(playwright, proxy=None):
   # print(device)
   # system = 
   # browser = await playwright.chromium.launch(headless=False)
-  browser = await playwright[playwright_device_list[1][random_device]["defaultBrowserType"]].launch()
+  browser = await playwright[playwright_device_list[1][random_device]["defaultBrowserType"]].launch(headless=False)
   
   return await browser.new_context(**device, 
     proxy={**proxy} if proxy else None,
