@@ -109,15 +109,15 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     await yr.scroll_into_view_if_needed()
     await page.select_option('#year', str(year))
     await page.evaluate('loadVehiclMakes()')
-    await page.wait_for_timeout(random.randint(1000, 2000))
+    await page.wait_for_timeout(random.randint(2000, 4000))
 
     
     make = await random_selector(page, '#make')
     await page.evaluate('loadModels()')
-    await page.wait_for_timeout(random.randint(1000, 2000))
+    await page.wait_for_timeout(random.randint(2000, 4000))
 
     model = await random_selector(page, '#model')
-    await page.wait_for_timeout(random.randint(1000, 2000))
+    await page.wait_for_timeout(random.randint(2000, 4000))
 
     insuredform = await random_selector(page, '#insuredform')
 
@@ -126,13 +126,13 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
 
     #PAGE 2
     print("PAGE 2")
-    await page.wait_for_timeout(random.randint(1000, 2000))
+    await page.wait_for_timeout(random.randint(2000, 4000))
 
     await page.type('#firstname', first_name, delay=random.randint(20, 120))
-    await page.wait_for_timeout(random.randint(1000, 2000))
+    await page.wait_for_timeout(random.randint(2000, 4000))
 
     await page.type('#lastname', last_name, delay=random.randint(20, 120))
-    await page.wait_for_timeout(random.randint(1000, 2000))
+    await page.wait_for_timeout(random.randint(2000, 4000))
     
     month = random.randint(1,12)
     month = month if len(str(month)) > 1 else f"0{month}"
@@ -143,7 +143,7 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     year = int(datetime.datetime.today().year) - random.randint(23, 61)
     dob = "/".join(map(str, [month,day,year]))
     await page.type('#dateofbirth', dob, delay=random.randint(90, 200))
-    await page.wait_for_timeout(random.randint(1000, 2000))
+    await page.wait_for_timeout(random.randint(2000, 4000))
 
 
     try:
@@ -151,16 +151,16 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     except NameError:
       gender = "Male"
     await page.select_option('#gender', gender)
-    await page.wait_for_timeout(random.randint(1000, 2000))
+    await page.wait_for_timeout(random.randint(2000, 4000))
 
     await page.type('#streetaddress', street_address, delay=random.randint(70, 200))
-    await page.wait_for_timeout(random.randint(1000, 2000))
+    await page.wait_for_timeout(random.randint(2000, 4000))
 
     await page.type('#zip', zipp, delay=random.randint(20, 120))
-    await page.wait_for_timeout(random.randint(1000, 2000))
+    await page.wait_for_timeout(random.randint(2000, 4000))
 
     await page.type('#phone', phone, delay=random.randint(20, 120))
-    await page.wait_for_timeout(random.randint(1000, 2000))
+    await page.wait_for_timeout(random.randint(2000, 4000))
 
     await page.type('#email', email, delay=random.randint(20, 120))
 
@@ -180,16 +180,14 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     #Part 2
     print("Part 2")
     education = await random_selector(page, '#education')
-    await page.wait_for_timeout(random.randint(1000, 2000))
-
-    await page.wait_for_timeout(random.randint(1000, 2000))
+    await page.wait_for_timeout(random.randint(2000, 4000))
 
     rating = random.choice(['Good', 'Excellent'])
     await page.select_option('#creditrating', rating)
-    await page.wait_for_timeout(random.randint(1000, 2000))
+    await page.wait_for_timeout(random.randint(2000, 4000))
 
     await page.select_option('#married', "No")
-    await page.wait_for_timeout(random.randint(1000, 2000))
+    await page.wait_for_timeout(random.randint(2000, 4000))
 
     # await page.select_option('#tickets', "No")
     # await page.wait_for_timeout(random.randint(1000, 2000))
