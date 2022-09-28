@@ -206,7 +206,7 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
 
     #PAGE 3
       await page.goto(f"http://auto.saveyourinsurance.com/submitDetails.php?{data[0]}", referer='http://auto.saveyourinsurance.com')
-    await page.wait_for_timeout(random.randint(3000, 60000))
+    await page.wait_for_timeout(random.randint(10000, 15000))
 
     print("Done")
 

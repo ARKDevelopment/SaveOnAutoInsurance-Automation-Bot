@@ -67,7 +67,7 @@ async def sql_delete(item):
     cur.execute("UPDATE log SET status = ? WHERE id = ?", (error_msg, idd))
     conn.commit()
     print(e)
-    return False
+    return True
   
 
 async def send_to_process(queue_items):
