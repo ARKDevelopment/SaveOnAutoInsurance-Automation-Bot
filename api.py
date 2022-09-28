@@ -171,3 +171,12 @@ async def automate(auto_insurance: AutoInsurance):
 def download_as_csv():
     sql_to_csv("logs.csv")
     return FileResponse('logs.csv', media_type='text/csv', filename='logs.csv')
+
+@app.get('/delete/{id}')
+def delete(id):
+    con = sqlite3.connect('autoinsurance.db')
+    cur = con.cursor()
+    cur.execute(f"DELETE FROM queue WHERE id='{id}'")
+    con.commit()
+    con.close()
+    return "Deleted!"
