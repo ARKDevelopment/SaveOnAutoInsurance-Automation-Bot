@@ -42,7 +42,7 @@ class AutoInsurance(BaseModel):
 def sql_to_csv(name):
     con = sqlite3.connect('autoinsurance.db')
     cur = con.cursor()
-    cmd = cur.execute("SELECT * FROM log")
+    cmd = cur.execute("SELECT * FROM log")[::-1]
 
     with open(name, 'w') as f:
         writer = csv.writer(f)
@@ -152,7 +152,7 @@ async def websocket_endpoint(websocket: WebSocket):
         # await websocket.send_text(new_data)
 
 
-@app.get('/log/{table}')
+@app.get('/{table}')
 def list_view(table):
     try:
         con = sqlite3.connect('autoinsurance.db')
