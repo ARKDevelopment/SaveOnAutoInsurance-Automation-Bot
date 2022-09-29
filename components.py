@@ -45,7 +45,7 @@ log_html = """
     </head>
     <body>
         <div>
-        <a href='/download' style='float:right'>Download csv</a>
+        <a href='/download'>Download csv</a>
         </div>
         <!--h3>Id, First Name, Last Name, Street Address, Zip, Phone, Email, Year, Make, Model, Insuredform, DOB, Gender, Education, Rating, Device, Status Status</h3-->
         <div id="log-body"></div>
