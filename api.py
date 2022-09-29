@@ -1,7 +1,6 @@
 import csv, sqlite3, uuid, pandas
 from fastapi import FastAPI, WebSocket
 from fastapi.responses import HTMLResponse
-from sqlalchemy import table
 from starlette.responses import FileResponse
 from pydantic import BaseModel
 from components import proxy_test, email_verified, log_html, percent_html
