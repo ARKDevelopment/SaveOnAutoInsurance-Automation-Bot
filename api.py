@@ -177,6 +177,7 @@ def delete(id):
     con = sqlite3.connect('autoinsurance.db')
     cur = con.cursor()
     cur.execute(f"DELETE FROM queue WHERE id='{id}'")
+    cur.execute(f"DELETE FROM log WHERE id='{id}'")
     con.commit()
     con.close()
     return "Deleted!"
