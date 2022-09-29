@@ -68,7 +68,8 @@ def sql_to_csv(name):
             ]
         )
 
-        writer.writerows(cmd[::-1])
+        log_rev = [*cmd][::-1]
+        writer.writerows(log_rev)
 
     con.close()
 
