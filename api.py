@@ -152,7 +152,7 @@ async def websocket_endpoint(websocket: WebSocket):
         # await websocket.send_text(new_data)
 
 
-@app.get('logs/{table}')
+@app.get('/log/{table}')
 def list_view(table):
     try:
         con = sqlite3.connect('autoinsurance.db')
