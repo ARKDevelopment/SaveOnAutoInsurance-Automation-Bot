@@ -47,7 +47,7 @@ log_html = """
         <div>
         <a href='/download' style='float:right'>Download csv</a>
         </div>
-        <h3>Id, First Name, Last Name, Street Address, Zip, Phone, Email, Year, Make, Model, Insuredform, DOB, Gender, Education, Rating, Device, Status Status</h3>
+        <!--h3>Id, First Name, Last Name, Street Address, Zip, Phone, Email, Year, Make, Model, Insuredform, DOB, Gender, Education, Rating, Device, Status Status</h3-->
         <div id="log-body"></div>
         <script>
             var ws = new WebSocket("ws://159.89.92.12:8000/ws");
@@ -76,6 +76,7 @@ def email_verified(email):
 
 
 def proxy_test(city, zipp):
+    #proxy test for city and zip to get password
   port = str(random.randint(9010, 9015))
   try:
       state = ziptostate(zipp)["state"].lower().replace(" ", "+")
@@ -103,10 +104,18 @@ def proxy_test(city, zipp):
   return password
 
 def post_data(data, headers, password):
+    #posting data to page 2 !OUTDATED!
     proxies = {"https" : f'http://XLdek13TDI94zkFC:{password}@proxy.froxy.com:9001'}
     r = requests.post("http://auto.saveyourinsurance.com/submitDetails.php",data, proxies=proxies, headers=headers)
 
 
+def proxy_test2(ip):
+    #random proxy test
+    r = requests.get("http://ifconfig.me", proxies={"http" : f"http://{ip}"})
+    print(r.text)
+
+
 if  "__main__" == __name__:
 #   print(email_verified("kfjdsljf@kdjf.com"))
-  print(proxy_test("New rochelle", "10801"))
+    proxy_test2("66.94.113.79:3128")
+#   print(proxy_test("New rochelle", "10801"))
