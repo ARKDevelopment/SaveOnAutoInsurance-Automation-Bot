@@ -1,6 +1,7 @@
 import csv, sqlite3, uuid, pandas
 from fastapi import FastAPI, WebSocket
 from fastapi.responses import HTMLResponse
+from sqlalchemy import table
 from starlette.responses import FileResponse
 from pydantic import BaseModel
 from components import proxy_test, email_verified, log_html, percent_html
@@ -11,17 +12,19 @@ app = FastAPI()
 
 conn = sqlite3.connect('autoinsurance.db')
 cur = conn.cursor()
-cur.execute("""CREATE TABLE IF NOT EXISTS queue (
-id TEXT,
-first_name TEXT,
-last_name TEXT,
-street_address TEXT,
-city TEXT,
-zip TEXT,
-phone TEXT,
-email TEXT
-); """
-            )
+
+for table in ["queue","errors"]:
+    cur.execute(f"""CREATE TABLE IF NOT EXISTS {table} (
+    id TEXT,
+    first_name TEXT,
+    last_name TEXT,
+    street_address TEXT,
+    city TEXT,
+    zip TEXT,
+    phone TEXT,
+    email TEXT
+        ); """
+    )
 
 conn.commit()
 conn.close()
@@ -70,6 +73,45 @@ def sql_to_csv(name):
 
     con.close()
 
+class AddToSQL:
+    def __init__(self, first_name, last_name, street_address, city, zipp, phone, email):
+        self.first_name = first_name
+        self.last_name = last_name
+        self.street_address = street_address
+        self.city = city
+        self.zipp = zipp
+        self.phone = phone
+        self.email = email
+
+    def exec(self, table, idd):
+        con = sqlite3.connect('autoinsurance.db')
+        self.cur = con.cursor()
+        self.cur.execute(f"""INSERT INTO {table} (
+            id, 
+            first_name, 
+            last_name, 
+            street_address, 
+            city, 
+            zip, 
+            phone, 
+            email
+            ) 
+            VALUES ({"?, "*7}?)""", 
+            (
+                idd,
+                self.first_name,
+                self.last_name,
+                self.street_address,
+                self.city,
+                self.zipp,
+                self.phone,
+                self.email
+            )
+        )
+        con.commit()
+        con.close()
+    
+
 @app.get("/")
 async def get():
     return HTMLResponse(percent_html)
@@ -101,6 +143,7 @@ async def websocket_endpoint(websocket: WebSocket):
         sql_to_csv('ws.csv')
         file = pandas.read_csv('ws.csv')
         await websocket.send_text(file.to_html())
+        
         # con = sqlite3.connect('autoinsurance.db')
         # cur = con.cursor()
         # cmd = cur.execute("SELECT * FROM log")
@@ -110,25 +153,32 @@ async def websocket_endpoint(websocket: WebSocket):
         # await websocket.send_text(new_data)
 
 
-@app.get('/queued')
-def queued():
-    con = sqlite3.connect('autoinsurance.db')
-    cur = con.cursor()
-    cmd = cur.execute("SELECT * FROM queue")
-    data = cmd.fetchall()
-    # data_str = "<br/>".join(list(data))
-    con.close()
-    return data
+@app.get('/{table}')
+def list_view(table):
+    try:
+        con = sqlite3.connect('autoinsurance.db')
+        cur = con.cursor()
+        cmd = cur.execute(f"SELECT * FROM {table}")
+        data = cmd.fetchall()
+        # data_str = "<br/>".join(list(data))
+        con.close()
+        return data
+    except:
+        return HTMLResponse("<h1>Invalid Address</h1>")
 
 
 @app.post('/add-to-queue')
 async def automate(auto_insurance: AutoInsurance):
+    idd = str(uuid.uuid4())
+    add_to_sql = AddToSQL(auto_insurance.first_name, auto_insurance.last_name, auto_insurance.street_address, auto_insurance.city, auto_insurance.zipp, auto_insurance.phone, auto_insurance.email)
     if not email_verified(auto_insurance.email): 
-        return "ERORR 400: Invalid Email!"
+        add_to_sql.exec("errors", "Invalid Email")
+        return "ERROR 400: Invalid Email!"
         # raise HTTPException(status_code=400, detail="Invalid email address")
 
     if len(auto_insurance.zipp.strip()) < 4 and len(auto_insurance.zipp.strip()) > 5:
-        return {"ERORR 400": "Invalid Zip Code!"}
+        add_to_sql.exec("errors", "Invalid Zip")
+        return {"ERROR 400": "Invalid Zip Code!"}
     elif len(auto_insurance.zipp.strip()) == 4:
         auto_insurance.zipp = "0" + auto_insurance.zipp.strip()
     # raise HTTPException(status_code=400, detail="Invalid Zip Code")    
@@ -136,34 +186,11 @@ async def automate(auto_insurance: AutoInsurance):
     try:
         proxy_test(auto_insurance.city, auto_insurance.zipp)
     except Exception as e:
-        return f"ERORR 400: {e}"
+        add_to_sql.exec("errors", e)
+        return f"ERROR 400: {e}"
         # raise HTTPException(status_code=400, detail="No proxies available for this zip code")
 
-    idd = str(uuid.uuid4())
-    con = sqlite3.connect('autoinsurance.db')
-    cur = con.cursor()
-    cur.execute(f"""INSERT INTO queue (
-    id, 
-    first_name, 
-    last_name, 
-    street_address, 
-    city, 
-    zip, 
-    phone, 
-    email
-    ) 
-    VALUES ({"?, "*7}?)""", (
-        idd,
-        auto_insurance.first_name,
-        auto_insurance.last_name,
-        auto_insurance.street_address,
-        auto_insurance.city,
-        auto_insurance.zipp,
-        auto_insurance.phone,
-        auto_insurance.email))
-
-    con.commit()
-    con.close()
+    add_to_sql.exec("queue", idd)
     return idd
 
 
