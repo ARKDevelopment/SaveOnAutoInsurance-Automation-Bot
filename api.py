@@ -42,7 +42,7 @@ class AutoInsurance(BaseModel):
 def sql_to_csv(name):
     con = sqlite3.connect('autoinsurance.db')
     cur = con.cursor()
-    cmd = cur.execute("SELECT * FROM log")[::-1]
+    cmd = cur.execute("SELECT * FROM log")
 
     with open(name, 'w') as f:
         writer = csv.writer(f)
@@ -68,7 +68,7 @@ def sql_to_csv(name):
             ]
         )
 
-        writer.writerows(cmd)
+        writer.writerows(cmd[::-1])
 
     con.close()
 
