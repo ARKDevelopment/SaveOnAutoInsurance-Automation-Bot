@@ -61,9 +61,10 @@ def sql_to_csv(name):
                 "Insured From",
                 "DOB",
                 "Gender",
-                "Device",
                 "Education",
                 "Rating",
+                "Device",
+                "Ip",
                 "Status"
             ]
         )
