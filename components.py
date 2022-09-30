@@ -50,7 +50,7 @@ log_html = """
         <!--h3>Id, First Name, Last Name, Street Address, Zip, Phone, Email, Year, Make, Model, Insuredform, DOB, Gender, Education, Rating, Device, Status Status</h3-->
         <div id="log-body"></div>
         <script>
-            var ws = new WebSocket("ws://0.0.0.0:8000/ws");
+            var ws = new WebSocket("ws://127.0.0.1:8000/ws");
             ws.onmessage = function(event) {
                 var messages = document.getElementById('log-body')
                 var content = document.createTextNode(event.data)
