@@ -5,7 +5,7 @@ from main import main
 import asyncio
 import sqlite3
 
-conn = sqlite3.connect('autoinsurance.db')
+conn = sqlite3.connect('log.db')
 cur = conn.cursor()
 
 
