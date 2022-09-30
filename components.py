@@ -18,7 +18,7 @@ percent_html = """
         <ul id='messages'>
         </ul>
         <script>
-            var ws = new WebSocket("ws://0.0.0.0:8000/percent");
+            var ws = new WebSocket("ws://45.79.124.51:8000//percent");
             ws.onmessage = function(event) {
                 var messages = document.getElementById('messages')
                 var message = document.createElement('li')
@@ -50,7 +50,7 @@ log_html = """
         <!--h3>Id, First Name, Last Name, Street Address, Zip, Phone, Email, Year, Make, Model, Insuredform, DOB, Gender, Education, Rating, Device, Status Status</h3-->
         <div id="log-body"></div>
         <script>
-            var ws = new WebSocket("/ws");
+            var ws = new WebSocket("ws://45.79.124.51:8000/ws");
             ws.onmessage = function(event) {
                 var messages = document.getElementById('log-body')
                 var content = document.createTextNode(event.data)
