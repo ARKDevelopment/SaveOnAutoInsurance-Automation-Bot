@@ -26,6 +26,7 @@ gender TEXT,
 education TEXT,
 rating TEXT,
 device TEXT,
+ip TEXT,
 status TEXT
 ); """
 )
@@ -41,15 +42,15 @@ async def sql_delete(item):
     conn.commit()
 
     # Inserting into log and making random data unknown
-    cur.execute("INSERT INTO log (id, first_name, last_name, street_address, zip, phone, email, year, make, model, insuredform, dob, gender, device, education, rating, status) VAlUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
-                                  (item[0],item[1],item[2],item[3],item[5],item[6],item[7], "?", "?", "?", "?", "?", "?", "?", "?", "?", 'running'))
+    cur.execute("INSERT INTO log (id, first_name, last_name, street_address, zip, phone, email, year, make, model, insuredform, dob, gender, device, ip, education, rating, status) VAlUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
+                                  (item[0],item[1],item[2],item[3],item[5],item[6],item[7], "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", 'running'))
     conn.commit()
 
     random_values = await main(*list(item[1:]))
 
     # Update Random Values into log
-    cur.execute("UPDATE log SET year=?, make=?, model=?, insuredform=?, dob=?, gender=?, education=?, rating=?, device=?, status=? WHERE id=?", 
-    (random_values[0], random_values[1], random_values[2], random_values[3], random_values[4], random_values[5], random_values[6], random_values[7], random_values[8], 'completed', idd,))
+    cur.execute("UPDATE log SET year=?, make=?, model=?, insuredform=?, dob=?, gender=?, education=?, rating=?, device=?, ip=? status=? WHERE id=?", 
+    (random_values[0], random_values[1], random_values[2], random_values[3], random_values[4], random_values[5], random_values[6], random_values[7], random_values[8], random_values[9], 'completed', idd,))
     # cur.execute("UPDATE log (id, first_name, last_name, street_address, zip, phone, email, year, make, model, insured, device, status) VAlUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (*item, *random_values, 'queued'))
     conn.commit()
 
