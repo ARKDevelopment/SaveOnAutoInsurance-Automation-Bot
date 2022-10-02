@@ -191,7 +191,7 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     # await page.wait_for_timeout(random.randint(1000, 2000))
 
     await page.check('#leadid_tcpa_disclosure')
-    submit_button = await page.query_selector('#submit >> nth=1')
+    submit_button = await page.query_selector('#submit')
     await submit_button.scroll_into_view_if_needed()
     await page.wait_for_timeout(random.randint(2000, 5000))
     data = []
