@@ -168,8 +168,6 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     await h3.scroll_into_view_if_needed()
     await page.wait_for_timeout(random.randint(2000, 5000))
 
-    
-
     #Part 2
     print("Part 2")
     education = await random_selector(page, '#education')
