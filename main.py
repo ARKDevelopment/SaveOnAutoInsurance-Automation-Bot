@@ -51,7 +51,7 @@ async def random_selector(page, selector):
 async def scroller(page, wait):
   while wait > 0:
       # print(wait)
-      about_us = await page.query_selector('[data-id="475a35b7"]')
+      about_us = await page.query_selector('text=About Us')
       await about_us.scroll_into_view_if_needed()
       rem = random.randint(2000, 5000)
       await page.wait_for_timeout(rem)
