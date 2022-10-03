@@ -3,7 +3,7 @@ from fastapi import FastAPI, WebSocket
 from fastapi.responses import HTMLResponse
 from starlette.responses import FileResponse
 from pydantic import BaseModel
-from components import proxy_test, email_verified, log_html, percent_html
+from components import proxyfy, email_verified, log_html, percent_html
 
 
 app = FastAPI()
@@ -185,13 +185,13 @@ async def automate(auto_insurance: AutoInsurance):
     # raise HTTPException(status_code=400, detail="Invalid Zip Code")    
 
     try:
-        proxy_test(auto_insurance.city, auto_insurance.zipp)
+        proxyfy(auto_insurance.zipp, auto_insurance.city)
+        add_to_sql.exec("queue", idd)
     except Exception as e:
         add_to_sql.exec("errors", e)
         return f"ERROR 400: {e}"
         # raise HTTPException(status_code=400, detail="No proxies available for this zip code")
 
-    add_to_sql.exec("queue", idd)
     return idd
 
 

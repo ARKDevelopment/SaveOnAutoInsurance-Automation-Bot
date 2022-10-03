@@ -65,57 +65,73 @@ log_html = """
 
 
 def ziptostate(zip):
-  req = requests.get(f"https://api.zippopotam.us/us/{zip}").text
-  return eval(req)["places"][0]
+    req = requests.get(f"https://api.zippopotam.us/us/{zip}").text
+    try:
+        return eval(req)["places"][0]
+    except KeyError:
+        raise Exception("Invalid zip code")
 
 
 def email_verified(email):
-  if re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", email):
-    return True
-  return False
+    if re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", email):
+        return True
+    return 
 
 
-def proxy_test(city, zipp):
+def froxy_proxy(state, city):
     #proxy test for city and zip to get password
-  port = str(random.randint(9010, 9015))
-  try:
-      state = ziptostate(zipp)["state"].lower().replace(" ", "+")
-      if state == "texas":
-          state = random.choice(["new+mexico", "oklahoma", "louisiana", "arkansas"])
-  except KeyError:
-      raise Exception("Invalid zip code")
+    state = state.lower().replace(" ", "+")
+    port = str(random.randint(9000, 9015))
 
-  try:
-      # city = city.lower().replace(" ", "+")
-      password = f'wifi;us;;{state};{city}'
-      # password = 'wifi;us;;{state};'
-      # print(password)
-      proxies = {"https" : f'http://XLdek13TDI94zkFC:{password}@proxy.froxy.com:{port}'}
-      r = requests.get("https://api.ipify.org", proxies=proxies)
-      # print(r.text)
-  except requests.exceptions.ProxyError:
-      try:
-        password = f'wifi;us;;{state};'
+    try:
+        password = f'wifi;us;;{state};{city}'
         proxies = {"https" : f'http://XLdek13TDI94zkFC:{password}@proxy.froxy.com:{port}'}
-        r = requests.get("https://tools.keycdn.com", proxies=proxies)
-      except requests.exceptions.ProxyError:
-        raise Exception("No proxy available for this location")
-      
-  return password
+        r = requests.get("https://api.ipify.org", proxies=proxies)
+    except requests.exceptions.ProxyError:
+        try:
+            password = f'wifi;us;;{state};'
+            proxies = {"https" : f'http://XLdek13TDI94zkFC:{password}@proxy.froxy.com:{port}'}
+            r = requests.get("https://api.ipify.org", proxies=proxies)
+        except requests.exceptions.ProxyError:
+            return
+    return {
+        "server": f"proxy.froxy.com:{port}",
+        "username": "XLdek13TDI94zkFC",
+        "password": password
+  } 
 
-def post_data(data, headers, password):
-    #posting data to page 2 !OUTDATED!
-    proxies = {"https" : f'http://XLdek13TDI94zkFC:{password}@proxy.froxy.com:9001'}
-    r = requests.post("http://auto.saveyourinsurance.com/submitDetails.php",data, proxies=proxies, headers=headers)
 
-
-def proxy_test2(ip):
+def smart_proxy(state):
     #random proxy test
-    r = requests.get("http://ifconfig.me", proxies={"http" : f"http://{ip}"})
-    print(r.text)
+    url = "https://api.smartproxy.com/v1/endpoints/sticky"
+
+    headers = {"accept": "application/json"}
+
+    response = requests.get(url, headers=headers)
+
+    for i in response.json():
+        if i["location"] == state.title():
+            return {"server":i["hostname"] + ":" + str(random.randint(*map(int, i["port_range"].replace(" ", "").split("-")))),
+                    "username": "sp55359177",
+                    "password": "sp55359177"}
+    return
+
+    # print(response.json())
+
+
+def proxyfy(zipp, city):
+    state = ziptostate(zipp)["state"]
+    proxy = [x for x in [froxy_proxy(state, city), smart_proxy(state)] if x]
+    try:
+        proxy = random.choice(proxy)
+    except IndexError:
+        raise Exception("No proxy available for this location")
+    
+    return proxy
 
 
 if  "__main__" == __name__:
+    print(proxyfy('100005', 'new york'))
 #   print(email_verified("kfjdsljf@kdjf.com"))
-    proxy_test2("66.94.113.79:3128")
 #   print(proxy_test("New rochelle", "10801"))
+    # random.choice([])

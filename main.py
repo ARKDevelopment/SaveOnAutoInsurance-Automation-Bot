@@ -1,6 +1,6 @@
 import asyncio, random, datetime, requests, json
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError 
-from components import proxy_test, post_data
+from components import proxyfy
 
 
 def genderize(name):
@@ -66,14 +66,9 @@ async def scroller(page, wait):
 async def main(first_name, last_name, street_address, city, zipp, phone, email):
   async with async_playwright() as p:
     port = random.randint(9000, 9008)
-    password = proxy_test(city, zipp)
     browser = await emulated_browser(
       p, 
-      proxy={
-        'server': 'proxy.froxy.com:' + str(port),
-        'username': 'XLdek13TDI94zkFC',
-        'password': password,
-      }
+      proxy=proxyfy(zipp, city)
     )
 
     page = await browser.new_page()
