@@ -66,7 +66,6 @@ async def scroller(page, wait):
 
 async def main(first_name, last_name, street_address, city, zipp, phone, email):
   async with async_playwright() as p:
-    port = random.randint(9000, 9008)
     browser = await emulated_browser(
       p, 
       proxy=proxyfy(zipp, city)
@@ -117,10 +116,12 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
 
     insuredform = await random_selector(page, '#insuredform')
 
+    await page.check('#leadid_tcpa_disclosure')
+    submit_button = await page.query_selector('#submit')
 
     #PAGE 2
     print("PAGE 2")
-    await page.wait_for_timeout(random.randint(2000, 4000))
+    await page.wait_for_timeout(random.randint(4000, 6000))
 
     await page.type('#firstname', first_name, delay=random.randint(20, 120))
     await page.wait_for_timeout(random.randint(2000, 4000))
@@ -184,7 +185,6 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     # await page.select_option('#tickets', "No")
     # await page.wait_for_timeout(random.randint(1000, 2000))
 
-    await page.check('#leadid_tcpa_disclosure')
     submit_button = await page.query_selector('#submit')
     await submit_button.scroll_into_view_if_needed()
     await page.wait_for_timeout(random.randint(2000, 5000))
