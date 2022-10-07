@@ -117,7 +117,7 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     insuredform = await random_selector(page, '#insuredform')
 
     await page.check('#leadid_tcpa_disclosure')
-    submit_button = await page.query_selector('#submit')
+    submit_button = await page.click('#submit')
 
     #PAGE 2
     print("PAGE 2")
@@ -162,16 +162,13 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     await page.check('#liketoreceive')
 
 
-    h3 = await page.query_selector('h3')
-    await h3.scroll_into_view_if_needed()
-    await page.wait_for_timeout(random.randint(2000, 5000))
-
-    h3 = await page.query_selector('h3 >> nth=1')
-    await h3.scroll_into_view_if_needed()
     await page.wait_for_timeout(random.randint(2000, 5000))
 
     #Part 2
     print("Part 2")
+    edu = await page.query_selector('#education')
+    await edu.scroll_into_view_if_needed()
+
     education = await random_selector(page, '#education')
     await page.wait_for_timeout(random.randint(2000, 4000))
 
@@ -185,7 +182,7 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     # await page.select_option('#tickets', "No")
     # await page.wait_for_timeout(random.randint(1000, 2000))
 
-    submit_button = await page.query_selector('#submit')
+    submit_button = await page.query_selector('#submit >> nth=1')
     await submit_button.scroll_into_view_if_needed()
     await page.wait_for_timeout(random.randint(2000, 5000))
     data = []
