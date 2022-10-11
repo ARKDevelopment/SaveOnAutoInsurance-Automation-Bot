@@ -1,9 +1,19 @@
 import csv, sqlite3, uuid, pandas
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, HTTPException
 from fastapi.responses import HTMLResponse
 from starlette.responses import FileResponse
 from pydantic import BaseModel
 from components import proxyfy, email_verified, log_html, percent_html
+from fastapi.logger import logger
+# ... other imports
+import logging
+
+gunicorn_logger = logging.getLogger('uvicorn.error')
+logger.handlers = gunicorn_logger.handlers
+if __name__ != "main":
+    logger.setLevel(gunicorn_logger.level)
+else:
+    logger.setLevel(logging.DEBUG)
 
 
 app = FastAPI()
@@ -141,7 +151,7 @@ async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     while True:
         data = await websocket.receive_text()
-        sql_to_csv('ws.csv')
+        sql_to_csv('logs/ws.csv')
         file = pandas.read_csv('ws.csv')
         await websocket.send_text(file.to_html())
         
@@ -172,24 +182,31 @@ def list_view(table):
 async def automate(auto_insurance: AutoInsurance):
     idd = str(uuid.uuid4())
     add_to_sql = AddToSQL(auto_insurance.first_name, auto_insurance.last_name, auto_insurance.street_address, auto_insurance.city, auto_insurance.zipp, auto_insurance.phone, auto_insurance.email)
+
+    missing_items = [k for k,v in auto_insurance.dict().items() if v == ""]
+    if len(missing_items) > 0:
+        add_to_sql.exec("errors", "Missing " + ", ".join(missing_items))
+        raise HTTPException(status_code=400, detail="Missing " + ", ".join(missing_items))
+    
+            
     if not email_verified(auto_insurance.email): 
         add_to_sql.exec("errors", "Invalid Email")
-        return "ERROR 400: Invalid Email!"
-        # raise HTTPException(status_code=400, detail="Invalid email address")
+        # return "ERROR 400: Invalid Email!"
+        raise HTTPException(status_code=404, detail="Invalid email address")
 
-    if len(auto_insurance.zipp.strip()) < 4 and len(auto_insurance.zipp.strip()) > 5:
+    if len(auto_insurance.zipp.strip()) not in [4, 5]:
         add_to_sql.exec("errors", "Invalid Zip")
-        return {"ERROR 400": "Invalid Zip Code!"}
+        raise HTTPException(status_code=404, detail="Invalid Zip Code")
+        # return {"ERROR 400": "Invalid Zip Code!"}
     elif len(auto_insurance.zipp.strip()) == 4:
         auto_insurance.zipp = "0" + auto_insurance.zipp.strip()
-    # raise HTTPException(status_code=400, detail="Invalid Zip Code")    
 
     try:
         proxyfy(auto_insurance.zipp, auto_insurance.city)
         add_to_sql.exec("queue", idd)
     except Exception as e:
         add_to_sql.exec("errors", e)
-        return f"ERROR 400: {e}"
+        raise HTTPException(status_code=404, detail=e)
         # raise HTTPException(status_code=400, detail="No proxies available for this zip code")
 
     return idd
@@ -197,7 +214,7 @@ async def automate(auto_insurance: AutoInsurance):
 
 @app.get('/download')
 def download_as_csv():
-    sql_to_csv("logs.csv")
+    sql_to_csv("logs/logs.csv")
     return FileResponse('logs.csv', media_type='text/csv', filename='logs.csv')
 
 @app.get('/delete/{id}')
