@@ -48,7 +48,7 @@ cur.execute("""CREATE TABLE IF NOT EXISTS log (
     date d
     ); """
 )
-cur.execute("SET time_zone='-04:00'")
+cur.execute("SET time_zone='-04:00';")
 
 conn.commit()
 conn.close()
