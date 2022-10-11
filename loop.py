@@ -27,7 +27,8 @@ education TEXT,
 rating TEXT,
 device TEXT,
 ip TEXT,
-status TEXT
+status TEXT,
+timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ); """
 )
 

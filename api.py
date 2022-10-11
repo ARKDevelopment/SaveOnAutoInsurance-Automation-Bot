@@ -22,7 +22,7 @@ for table in ["queue","errors"]:
     zip TEXT,
     phone TEXT,
     email TEXT,
-    timestamp TIMESTAMP
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         ); """
     )
 
@@ -45,10 +45,9 @@ cur.execute("""CREATE TABLE IF NOT EXISTS log (
     device TEXT,
     ip TEXT,
     status TEXT,
-    date d
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ); """
 )
-cur.execute("SET time_zone='-04:00';")
 
 conn.commit()
 conn.close()
