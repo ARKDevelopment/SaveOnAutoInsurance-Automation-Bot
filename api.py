@@ -1,4 +1,4 @@
-import csv, sqlite3, uuid, pandas
+import csv, sqlite3, uuid, pandas, datetime
 from fastapi import FastAPI, WebSocket, HTTPException
 from fastapi.responses import HTMLResponse
 from starlette.responses import FileResponse
@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from components import proxyfy, email_verified, log_html, percent_html
 
 app = FastAPI()
+print(datetime.date.today())
 
 
 conn = sqlite3.connect('autoinsurance.db')
@@ -44,9 +45,10 @@ cur.execute("""CREATE TABLE IF NOT EXISTS log (
     device TEXT,
     ip TEXT,
     status TEXT,
-    timestamp TIMESTAMP
+    date d
     ); """
 )
+cur.execute("SET time_zone='-04:00'")
 
 conn.commit()
 conn.close()
@@ -119,7 +121,8 @@ class AddToSQL:
             city, 
             zip, 
             phone, 
-            email
+            email,
+            timestamp
             ) 
             VALUES ({"?, "*7}?)""", 
             (
