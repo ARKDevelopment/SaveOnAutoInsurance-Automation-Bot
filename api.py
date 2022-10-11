@@ -149,19 +149,9 @@ class AddToSQL:
             zip,
             phone,
             email,
-            year,
-            make,
-            model,
-            insuredform,
-            dob,
-            gender,
-            education,
-            rating,
-            device,
-            ip,
             status
             )
-            values ({"?, "*17}?)""",
+            values ({"?, "*7}?)""",
             (
                 idd,
                 self.first_name,
@@ -170,7 +160,6 @@ class AddToSQL:
                 self.zipp,
                 self.phone,
                 self.email,
-                *[holder] *10,
                 status
             )
         )
