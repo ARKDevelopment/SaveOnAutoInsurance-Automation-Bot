@@ -26,26 +26,26 @@ for table in ["queue","errors"]:
     )
 
 cur.execute("""CREATE TABLE IF NOT EXISTS log (
-id TEXT,
-first_name TEXT,
-last_name TEXT,
-street_address TEXT,
-zip TEXT,
-phone TEXT,
-email TEXT,
-year TEXT,
-make TEXT,
-model TEXT,
-insuredform TEXT,
-dob TEXT,
-gender TEXT,
-education TEXT,
-rating TEXT,
-device TEXT,
-ip TEXT,
-status TEXT,
-timestamp TIMESTAMP
-); """
+    id TEXT,
+    first_name TEXT,
+    last_name TEXT,
+    street_address TEXT,
+    zip TEXT,
+    phone TEXT,
+    email TEXT,
+    year TEXT,
+    make TEXT,
+    model TEXT,
+    insuredform TEXT,
+    dob TEXT,
+    gender TEXT,
+    education TEXT,
+    rating TEXT,
+    device TEXT,
+    ip TEXT,
+    status TEXT,
+    timestamp TIMESTAMP
+    ); """
 )
 
 conn.commit()
@@ -167,11 +167,13 @@ class AddToSQL:
                 self.street_address,
                 self.zipp,
                 self.phone,
-                self.email
+                self.email,
                 *[holder] *10,
                 status
             )
         )
+        con.commit()
+        con.close()
 
 
     
