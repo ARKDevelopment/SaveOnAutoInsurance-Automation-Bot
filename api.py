@@ -4,17 +4,6 @@ from fastapi.responses import HTMLResponse
 from starlette.responses import FileResponse
 from pydantic import BaseModel
 from components import proxyfy, email_verified, log_html, percent_html
-from fastapi.logger import logger
-# ... other imports
-import logging
-
-gunicorn_logger = logging.getLogger('uvicorn.error')
-logger.handlers = gunicorn_logger.handlers
-if __name__ != "main":
-    logger.setLevel(gunicorn_logger.level)
-else:
-    logger.setLevel(logging.DEBUG)
-
 
 app = FastAPI()
 
@@ -31,22 +20,46 @@ for table in ["queue","errors"]:
     city TEXT,
     zip TEXT,
     phone TEXT,
-    email TEXT
+    email TEXT,
+    timestamp TIMESTAMP
         ); """
     )
+
+cur.execute("""CREATE TABLE IF NOT EXISTS log (
+id TEXT,
+first_name TEXT,
+last_name TEXT,
+street_address TEXT,
+zip TEXT,
+phone TEXT,
+email TEXT,
+year TEXT,
+make TEXT,
+model TEXT,
+insuredform TEXT,
+dob TEXT,
+gender TEXT,
+education TEXT,
+rating TEXT,
+device TEXT,
+ip TEXT,
+status TEXT,
+timestamp TIMESTAMP
+); """
+)
 
 conn.commit()
 conn.close()
 
 
 class AutoInsurance(BaseModel):
-    first_name: str
-    last_name: str
-    street_address: str
-    city: str
-    zipp: str
-    phone: str
-    email: str
+    first_name: str = ""
+    last_name: str = ""
+    street_address: str = ""
+    city: str = ""
+    zipp: str = ""
+    phone: str = ""
+    email: str = ""
 
 
 def sql_to_csv(name):
@@ -121,6 +134,45 @@ class AddToSQL:
         )
         con.commit()
         con.close()
+
+    def add_to_log(self, idd, status, holder):
+        con = sqlite3.connect('autoinsurance.db')
+        self.cur = con.cursor()
+        self.cur.execute(f"""INSERT INTO log (
+            id,
+            first_name,
+            last_name,
+            street_address,
+            zip,
+            phone,
+            email,
+            year,
+            make,
+            model,
+            insuredform,
+            dob,
+            gender,
+            education,
+            rating,
+            device,
+            ip,
+            status
+            )
+            values ({"?, "*17}?)""",
+            (
+                idd,
+                self.first_name,
+                self.last_name,
+                self.street_address,
+                self.zipp,
+                self.phone,
+                self.email
+                *[holder] *10,
+                status
+            )
+        )
+
+
     
 
 @app.get("/")
@@ -180,22 +232,24 @@ def list_view(table):
 
 @app.post('/add-to-queue')
 async def automate(auto_insurance: AutoInsurance):
+    
     idd = str(uuid.uuid4())
     add_to_sql = AddToSQL(auto_insurance.first_name, auto_insurance.last_name, auto_insurance.street_address, auto_insurance.city, auto_insurance.zipp, auto_insurance.phone, auto_insurance.email)
 
     missing_items = [k for k,v in auto_insurance.dict().items() if v == ""]
+    print(auto_insurance.dict().items())
     if len(missing_items) > 0:
-        add_to_sql.exec("errors", "Missing " + ", ".join(missing_items))
+        add_to_sql.add_to_log("errors", "Missing " + ", ".join(missing_items), "x")
         raise HTTPException(status_code=400, detail="Missing " + ", ".join(missing_items))
     
             
     if not email_verified(auto_insurance.email): 
-        add_to_sql.exec("errors", "Invalid Email")
+        add_to_sql.add_to_log("errors", "Invalid Email", "x")
         # return "ERROR 400: Invalid Email!"
         raise HTTPException(status_code=404, detail="Invalid email address")
 
     if len(auto_insurance.zipp.strip()) not in [4, 5]:
-        add_to_sql.exec("errors", "Invalid Zip")
+        add_to_sql.add_to_log("errors", "Invalid Zip", "x")
         raise HTTPException(status_code=404, detail="Invalid Zip Code")
         # return {"ERROR 400": "Invalid Zip Code!"}
     elif len(auto_insurance.zipp.strip()) == 4:
@@ -204,10 +258,12 @@ async def automate(auto_insurance: AutoInsurance):
     try:
         proxyfy(auto_insurance.zipp, auto_insurance.city)
         add_to_sql.exec("queue", idd)
+        add_to_sql.add_to_log(idd, "queue", "?")
     except Exception as e:
-        add_to_sql.exec("errors", e)
+        add_to_sql.add_to_log("errors", str(e), "x")
         raise HTTPException(status_code=404, detail=e)
         # raise HTTPException(status_code=400, detail="No proxies available for this zip code")
+
 
     return idd
 
