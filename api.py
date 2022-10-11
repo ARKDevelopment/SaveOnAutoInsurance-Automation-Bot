@@ -88,7 +88,8 @@ def sql_to_csv(name):
                 "Rating",
                 "Device",
                 "Ip",
-                "Status"
+                "Status",
+                "Time Stamp"
             ]
         )
 
@@ -203,7 +204,7 @@ async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     while True:
         data = await websocket.receive_text()
-        sql_to_csv('logs/ws.csv')
+        sql_to_csv('ws.csv')
         file = pandas.read_csv('ws.csv')
         await websocket.send_text(file.to_html())
         
@@ -270,7 +271,7 @@ async def automate(auto_insurance: AutoInsurance):
 
 @app.get('/download')
 def download_as_csv():
-    sql_to_csv("logs/logs.csv")
+    sql_to_csv("logs.csv")
     return FileResponse('logs.csv', media_type='text/csv', filename='logs.csv')
 
 @app.get('/delete/{id}')
