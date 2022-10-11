@@ -37,32 +37,6 @@ percent_html = """
 </html>
 """
 
-log_html = """
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Logs</title>
-    </head>
-    <body>
-        <div>
-        <a href='/download'>Download csv</a>
-        </div>
-        <!--h3>Id, First Name, Last Name, Street Address, Zip, Phone, Email, Year, Make, Model, Insuredform, DOB, Gender, Education, Rating, Device, Status Status</h3-->
-        <div id="log-body"></div>
-        <script>
-            var ws = new WebSocket("ws://45.79.124.51:8000/ws");
-            ws.onmessage = function(event) {
-                var messages = document.getElementById('log-body')
-                var content = document.createTextNode(event.data)
-                messages.innerHTML = content.textContent
-            };
-             setInterval(() => ws.send('DataRequest'), 500)
-        </script>
-    </body>
-</html>
-"""
-
-
 
 def ziptostate(zip):
     req = requests.get(f"https://api.zippopotam.us/us/{zip}").text

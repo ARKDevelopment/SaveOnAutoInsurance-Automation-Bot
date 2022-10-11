@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Logs</title>
+        <script>
+            var ws = new WebSocket("ws://45.79.124.51:8000/ws");
+            ws.onmessage = function(event) {
+                var messages = document.getElementById('log-body')
+                var content = document.createTextNode(event.data)
+                messages.innerHTML = content.textContent
+            };
+             setInterval(() => ws.send('DataRequest'), 500)
+        </script>
+        <script type="text/javascript">
+          function downloadPromt() {
+              var from = prompt("From (yyyy-mm-dd)");
+              if (from){
+                var to = prompt("to (yyyy-mm-dd)");
+                if (confirm(`From: ${from}\nTo: ${to ? to: "now"}`)){
+                 window.location.href = `/download/${from}/${to ? to: "0"}`; 
+                }
+              }
+            }
+      </script>
+    </head>
+    <body>
+        <div>
+          <button onclick="downloadPromt()">Download</button>
+        <a href='/download'>Download full csv</a>
+        </div>
+        <div id="log-body"></div>
+    </body>
+</html>

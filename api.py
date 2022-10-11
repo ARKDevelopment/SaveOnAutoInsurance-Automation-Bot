@@ -3,7 +3,7 @@ from fastapi import FastAPI, WebSocket, HTTPException
 from fastapi.responses import HTMLResponse
 from starlette.responses import FileResponse
 from pydantic import BaseModel
-from components import proxyfy, email_verified, log_html, percent_html
+from components import proxyfy, email_verified, percent_html
 
 app = FastAPI()
 print(datetime.date.today())
@@ -63,10 +63,10 @@ class AutoInsurance(BaseModel):
     email: str = ""
 
 
-def sql_to_csv(name):
+def sql_to_csv(name, funct):
     con = sqlite3.connect('autoinsurance.db')
     cur = con.cursor()
-    cmd = cur.execute("SELECT * FROM log")
+    cmd = cur.execute(funct)
 
     with open(name, 'w') as f:
         writer = csv.writer(f)
@@ -189,6 +189,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
 @app.get("/log")
 async def get():
+    log_html = open("log.html").read()
     return HTMLResponse(log_html)
 
 
@@ -197,7 +198,7 @@ async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     while True:
         data = await websocket.receive_text()
-        sql_to_csv('ws.csv')
+        sql_to_csv('ws.csv', "SELECT * FROM log")
         file = pandas.read_csv('ws.csv')
         await websocket.send_text(file.to_html())
         
@@ -261,11 +262,17 @@ async def automate(auto_insurance: AutoInsurance):
 
     return idd
 
-
 @app.get('/download')
-def download_as_csv():
-    sql_to_csv("logs.csv")
-    return FileResponse('logs.csv', media_type='text/csv', filename='logs.csv')
+def download_full_csv():
+    sql_to_csv("logs.csv", "SELECT * FROM log")
+    return FileResponse('logs.csv', media_type='text/csv', filename=f'logs.csv(full)')
+
+@app.get('/download/{fromm}/{to}')
+def download_as_csv(fromm, to):
+    sql_to_csv("logs.csv", f"""SELECT * 
+                            FROM log 
+                            WHERE timestamp {"BETWEEN" if to else ">"} {fromm} 00:00 {f"and {to} 23:59" if to else ""};""")
+    return FileResponse('logs.csv', media_type='text/csv', filename=f'logs.csv({fromm}>{to if to else "now"})')
 
 @app.get('/delete/{id}')
 def delete(id):
