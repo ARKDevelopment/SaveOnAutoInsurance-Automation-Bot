@@ -3,7 +3,7 @@ from fastapi import FastAPI, WebSocket, HTTPException
 from fastapi.responses import HTMLResponse
 from starlette.responses import FileResponse
 from pydantic import BaseModel
-from components import proxyfy, email_verified, percent_html
+import components
 
 app = FastAPI()
 print(datetime.date.today())
@@ -123,8 +123,7 @@ class AddToSQL:
             city, 
             zip, 
             phone, 
-            email,
-            timestamp
+            email
             ) 
             VALUES ({"?, "*7}?)""", 
             (
@@ -141,7 +140,7 @@ class AddToSQL:
         con.commit()
         con.close()
 
-    def add_to_log(self, idd, status, holder):
+    def log(self, idd, status, holder):
         con = sqlite3.connect('autoinsurance.db')
         self.cur = con.cursor()
         self.cur.execute(f"""INSERT INTO log (
@@ -174,7 +173,7 @@ class AddToSQL:
 
 @app.get("/")
 async def get():
-    return HTMLResponse(percent_html)
+    return HTMLResponse(components.percent_html)
 
 
 @app.websocket("/percent")
@@ -237,28 +236,33 @@ async def automate(auto_insurance: AutoInsurance):
     missing_items = [k for k,v in auto_insurance.dict().items() if v == ""]
     print(auto_insurance.dict().items())
     if len(missing_items) > 0:
-        add_to_sql.add_to_log("errors", "Missing " + ", ".join(missing_items), "x")
+        msg = "Missing " + ", ".join(missing_items)
+        add_to_sql.exec("errors", msg)
+        add_to_sql.log("errors", msg, "x")
         raise HTTPException(status_code=400, detail="Missing " + ", ".join(missing_items))
     
             
-    if not email_verified(auto_insurance.email): 
-        add_to_sql.add_to_log("errors", "Invalid Email", "x")
+    if not components.email_verified(auto_insurance.email): 
+        add_to_sql.exec("errors", "Invalid Email")
+        add_to_sql.log("errors", "Invalid Email", "x")
         # return "ERROR 400: Invalid Email!"
         raise HTTPException(status_code=404, detail="Invalid email address")
 
     if len(auto_insurance.zipp.strip()) not in [4, 5]:
-        add_to_sql.add_to_log("errors", "Invalid Zip", "x")
+        add_to_sql.exec("errors", "Invalid Zip")
+        add_to_sql.log("errors", "Invalid Zip", "x")
         raise HTTPException(status_code=404, detail="Invalid Zip Code")
         # return {"ERROR 400": "Invalid Zip Code!"}
     elif len(auto_insurance.zipp.strip()) == 4:
         auto_insurance.zipp = "0" + auto_insurance.zipp.strip()
 
     try:
-        proxyfy(auto_insurance.zipp, auto_insurance.city)
+        components.proxyfy(auto_insurance.zipp, auto_insurance.city)
         add_to_sql.exec("queue", idd)
-        add_to_sql.add_to_log(idd, "queue", "?")
+        add_to_sql.log(idd, "queue", "?")
     except Exception as e:
-        add_to_sql.add_to_log("errors", str(e), "x")
+        add_to_sql.exec("errors", str(e))
+        add_to_sql.log("errors", str(e), "x")
         raise HTTPException(status_code=404, detail=e)
         # raise HTTPException(status_code=400, detail="No proxies available for this zip code")
 
@@ -273,14 +277,13 @@ def download_full_csv():
 @app.get('/download/{fromm}/{to}')
 def download_as_csv(fromm, to):
     to = to if to != "0" else datetime.datetime.now().strftime("%Y-%m-%d")
-    print(to)
     sql_to_csv("logs.csv", f"""SELECT * 
                                 FROM log
                                 where date >= '{fromm}'
                                 AND date <= '{to}'""")
     return FileResponse('logs.csv', media_type='text/csv', filename=f'logs({fromm}>{to if to else "now"}).csv')
 
-@app.get('/delete/{id}')
+@app.delete('/delete/{id}')
 def delete(id):
     con = sqlite3.connect('autoinsurance.db')
     cur = con.cursor()
