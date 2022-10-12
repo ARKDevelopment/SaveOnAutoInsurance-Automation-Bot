@@ -47,7 +47,7 @@ async def sql_delete(item):
                                   (item[0],item[1],item[2],item[3],item[5],item[6],item[7], "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", 'running'))
     conn.commit()
 
-    random_values = await main(*list(item[1:][:8]))
+    random_values = await main(*list(item[1:][:7]))
 
     # Update Random Values into log
     cur.execute("UPDATE log SET year=?, make=?, model=?, insuredform=?, dob=?, gender=?, education=?, rating=?, device=?, ip=?, status=? WHERE id=?", 
