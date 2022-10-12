@@ -5,9 +5,8 @@ from starlette.responses import FileResponse
 from pydantic import BaseModel
 import components
 
-app = FastAPI()
-print(datetime.date.today())
 
+app = FastAPI()
 
 conn = sqlite3.connect('autoinsurance.db')
 cur = conn.cursor()
@@ -65,6 +64,75 @@ class AutoInsurance(BaseModel):
     email: str = ""
 
 
+class AddToSQL:
+    def __init__(self, first_name, last_name, street_address, city, zipp, phone, email):
+        self.first_name = first_name
+        self.last_name = last_name
+        self.street_address = street_address
+        self.city = city
+        self.zipp = zipp
+        self.phone = phone
+        self.email = email
+
+
+    def exec(self, table, idd):
+        con = sqlite3.connect('autoinsurance.db')
+        self.cur = con.cursor()
+        self.cur.execute(f"""INSERT INTO {table} (
+            id, 
+            first_name, 
+            last_name, 
+            street_address, 
+            city, 
+            zip, 
+            phone, 
+            email
+            ) 
+            VALUES ({"?, "*7}?)""", 
+            (
+                idd,
+                self.first_name,
+                self.last_name,
+                self.street_address,
+                self.city,
+                self.zipp,
+                self.phone,
+                self.email
+            )
+        )
+        con.commit()
+        con.close()
+
+
+    def log(self, idd, status, holder):
+        con = sqlite3.connect('autoinsurance.db')
+        self.cur = con.cursor()
+        self.cur.execute(f"""INSERT INTO log (
+            id,
+            first_name,
+            last_name,
+            street_address,
+            zip,
+            phone,
+            email,
+            status
+            )
+            values ({"?, "*7}?)""",
+            (
+                idd,
+                self.first_name,
+                self.last_name,
+                self.street_address,
+                self.zipp,
+                self.phone,
+                self.email,
+                status
+            )
+        )
+        con.commit()
+        con.close()
+
+
 def sql_to_csv(name, funct):
     con = sqlite3.connect('autoinsurance.db')
     cur = con.cursor()
@@ -102,74 +170,6 @@ def sql_to_csv(name, funct):
 
     con.close()
 
-class AddToSQL:
-    def __init__(self, first_name, last_name, street_address, city, zipp, phone, email):
-        self.first_name = first_name
-        self.last_name = last_name
-        self.street_address = street_address
-        self.city = city
-        self.zipp = zipp
-        self.phone = phone
-        self.email = email
-
-    def exec(self, table, idd):
-        con = sqlite3.connect('autoinsurance.db')
-        self.cur = con.cursor()
-        self.cur.execute(f"""INSERT INTO {table} (
-            id, 
-            first_name, 
-            last_name, 
-            street_address, 
-            city, 
-            zip, 
-            phone, 
-            email
-            ) 
-            VALUES ({"?, "*7}?)""", 
-            (
-                idd,
-                self.first_name,
-                self.last_name,
-                self.street_address,
-                self.city,
-                self.zipp,
-                self.phone,
-                self.email
-            )
-        )
-        con.commit()
-        con.close()
-
-    def log(self, idd, status, holder):
-        con = sqlite3.connect('autoinsurance.db')
-        self.cur = con.cursor()
-        self.cur.execute(f"""INSERT INTO log (
-            id,
-            first_name,
-            last_name,
-            street_address,
-            zip,
-            phone,
-            email,
-            status
-            )
-            values ({"?, "*7}?)""",
-            (
-                idd,
-                self.first_name,
-                self.last_name,
-                self.street_address,
-                self.zipp,
-                self.phone,
-                self.email,
-                status
-            )
-        )
-        con.commit()
-        con.close()
-
-
-    
 
 @app.get("/")
 async def get():
@@ -219,17 +219,17 @@ def list_view(table):
         con = sqlite3.connect('autoinsurance.db')
         cur = con.cursor()
         cmd = cur.execute(f"SELECT * FROM {table}")
-        data = cmd.fetchall()
-        # data_str = "<br/>".join(list(data))
+        # data = cmd.fetchall()
+        data_str = "<br>".join([str(cmd) for cmd in cmd])
+        # data_str = " ".join([*cmd])
         con.close()
-        return data
-    except:
+        return HTMLResponse(data_str)
+    except KeyboardInterrupt:
         return HTMLResponse("<h1>Invalid Address</h1>")
 
 
 @app.post('/add-to-queue')
 async def automate(auto_insurance: AutoInsurance):
-    
     idd = str(uuid.uuid4())
     add_to_sql = AddToSQL(auto_insurance.first_name, auto_insurance.last_name, auto_insurance.street_address, auto_insurance.city, auto_insurance.zipp, auto_insurance.phone, auto_insurance.email)
 
@@ -241,7 +241,6 @@ async def automate(auto_insurance: AutoInsurance):
         add_to_sql.log("errors", msg, "x")
         raise HTTPException(status_code=400, detail="Missing " + ", ".join(missing_items))
     
-            
     if not components.email_verified(auto_insurance.email): 
         add_to_sql.exec("errors", "Invalid Email")
         add_to_sql.log("errors", "Invalid Email", "x")
@@ -266,13 +265,14 @@ async def automate(auto_insurance: AutoInsurance):
         raise HTTPException(status_code=404, detail=e)
         # raise HTTPException(status_code=400, detail="No proxies available for this zip code")
 
-
     return idd
+
 
 @app.get('/download')
 def download_full_csv():
     sql_to_csv("logs.csv", "SELECT * FROM log")
     return FileResponse('logs.csv', media_type='text/csv', filename=f'full_logs.csv')
+
 
 @app.get('/download/{fromm}/{to}')
 def download_as_csv(fromm, to):
@@ -282,6 +282,7 @@ def download_as_csv(fromm, to):
                                 where date >= '{fromm}'
                                 AND date <= '{to}'""")
     return FileResponse('logs.csv', media_type='text/csv', filename=f'logs({fromm}>{to if to else "now"}).csv')
+
 
 @app.delete('/delete/{id}')
 def delete(id):
