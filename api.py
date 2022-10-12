@@ -22,7 +22,8 @@ for table in ["queue","errors"]:
     zip TEXT,
     phone TEXT,
     email TEXT,
-    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    date DATE DEFAULT CURRENT_DATE,
+    time TIME DEFAULT CURRENT_TIME
         ); """
     )
 
@@ -45,7 +46,8 @@ cur.execute("""CREATE TABLE IF NOT EXISTS log (
     device TEXT,
     ip TEXT,
     status TEXT,
-    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    date DATE DEFAULT CURRENT_DATE,
+    time TIME DEFAULT CURRENT_TIME
     ); """
 )
 
@@ -90,7 +92,8 @@ def sql_to_csv(name, funct):
                 "Device",
                 "Ip",
                 "Status",
-                "Time Stamp"
+                "Date",
+                "Time"
             ]
         )
 
@@ -265,14 +268,17 @@ async def automate(auto_insurance: AutoInsurance):
 @app.get('/download')
 def download_full_csv():
     sql_to_csv("logs.csv", "SELECT * FROM log")
-    return FileResponse('logs.csv', media_type='text/csv', filename=f'logs.csv(full)')
+    return FileResponse('logs.csv', media_type='text/csv', filename=f'full_logs.csv')
 
 @app.get('/download/{fromm}/{to}')
 def download_as_csv(fromm, to):
+    to = to if to != "0" else datetime.datetime.now().strftime("%Y-%m-%d")
+    print(to)
     sql_to_csv("logs.csv", f"""SELECT * 
-                            FROM log 
-                            WHERE timestamp {"BETWEEN" if to else ">"} {fromm} 00:00 {f"and {to} 23:59" if to else ""};""")
-    return FileResponse('logs.csv', media_type='text/csv', filename=f'logs.csv({fromm}>{to if to else "now"})')
+                                FROM log
+                                where date >= '{fromm}'
+                                AND date <= '{to}'""")
+    return FileResponse('logs.csv', media_type='text/csv', filename=f'logs({fromm}>{to if to else "now"}).csv')
 
 @app.get('/delete/{id}')
 def delete(id):
