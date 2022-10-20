@@ -1,6 +1,7 @@
 import os
 import time
 from uuid import uuid4
+
 from main import main
 import asyncio
 import sqlite3
@@ -82,11 +83,11 @@ def main_loop():
 
     # Taking all from queue if less than 5 otherwise taking 5
     if len(queue_items) < 5 and len(queue_items) > 0:
-      asyncio.run(send_to_process(queue_items))
+      asyncio.wait_for(send_to_process(queue_items), timeout=320)
     elif len(queue_items) >= 5:
-      asyncio.run(send_to_process(queue_items[:5]))
+      asyncio.wait_for(send_to_process(queue_items[:5]), timeout=320)
 
-    time.sleep(5)
+    time.sleep(2)
 
 if __name__ == "__main__":
   try:
