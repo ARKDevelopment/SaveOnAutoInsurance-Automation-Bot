@@ -51,14 +51,20 @@ async def random_selector(page, selector):
 async def scroller(page, wait):
   while wait > 0:
       print('AU')
-      about_us = await page.query_selector('#kool')
-      await about_us.scroll_into_view_if_needed()
+      try:
+        about_us = await page.query_selector('#kool')
+        await about_us.scroll_into_view_if_needed()
+      except:
+        pass
       rem = random.randint(2000, 5000)
       await page.wait_for_timeout(rem)
       wait -= rem
       print("foot")
-      foot = await page.query_selector('footer')
-      await foot.scroll_into_view_if_needed()
+      try:
+        foot = await page.query_selector('footer')
+        await foot.scroll_into_view_if_needed()
+      except:
+        pass
       rem = random.randint(2000, 5000)
       await page.wait_for_timeout(rem)
       wait -= rem
