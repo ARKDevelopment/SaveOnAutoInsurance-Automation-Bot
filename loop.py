@@ -81,10 +81,10 @@ def main_loop():
     queue_items = [x for x in cmd]
 
     # Taking all from queue if less than 5 otherwise taking 5
-    if len(queue_items) < 10 and len(queue_items) > 0:
+    if len(queue_items) < 5 and len(queue_items) > 0:
       asyncio.run(send_to_process(queue_items))
-    elif len(queue_items) >= 10:
-      asyncio.run(send_to_process(queue_items[:10]))
+    elif len(queue_items) >= 5:
+      asyncio.run(send_to_process(queue_items[:5]))
 
     time.sleep(5)
 
