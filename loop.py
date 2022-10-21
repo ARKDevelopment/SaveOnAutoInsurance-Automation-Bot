@@ -82,9 +82,9 @@ def main_loop():
 
     # Taking all from queue if less than 5 otherwise taking 5
     if len(queue_items) < 5 and len(queue_items) > 0:
-      asyncio.run(asyncio.wait_for(send_to_process(queue_items), timeout=60))
+      asyncio.run(asyncio.wait_for(send_to_process(queue_items), timeout=360))
     elif len(queue_items) >= 5:
-      asyncio.run(asyncio.wait_for(send_to_process(queue_items[:5], timeout=60)))
+      asyncio.run(asyncio.wait_for(send_to_process(queue_items[:5], timeout=360)))
       # asyncio.run(send_to_process(queue_items[:5]))
 
     time.sleep(5)
