@@ -83,9 +83,17 @@ def main_loop():
     # Taking all from queue if less than 5 otherwise taking 5
     try:
       if len(queue_items) < 10 and len(queue_items) > 0:
-        asyncio.run(asyncio.wait_for(send_to_process(queue_items), timeout=360))
+        asyncio.run(
+          asyncio.wait_for(
+            send_to_process(queue_items), 
+            timeout=360)
+            )
       elif len(queue_items) >= 10:
-        asyncio.run(asyncio.wait_for(send_to_process(queue_items[:10], timeout=360)))
+        asyncio.run(
+          asyncio.wait_for(
+            send_to_process(queue_items[:10]),
+             timeout=360)
+             )
     except asyncio.TimeoutError:
       print("Timeout Error")
       pass
