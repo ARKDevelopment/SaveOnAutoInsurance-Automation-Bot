@@ -88,10 +88,10 @@ def main_loop():
             send_to_process(queue_items), 
             timeout=360)
             )
-      elif len(queue_items) >= 10:
+      elif len(queue_items) >= 15:
         asyncio.run(
           asyncio.wait_for(
-            send_to_process(queue_items[:10]),
+            send_to_process(queue_items[:15]),
              timeout=360)
              )
     except asyncio.TimeoutError:
