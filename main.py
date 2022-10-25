@@ -24,8 +24,10 @@ async def emulated_browser(playwright, proxy=None):
   global random_device
   random_device = random.choice(device_list)
   # random_device = device_list[9]
+  print(random_device)
   
   device = playwright.devices[random_device]
+  print(random_device)
   # device.pop("viewport")
   # print(device)
   # system = 
@@ -203,6 +205,7 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
 
 
 if __name__ == "__main__":
+  # print(playwright_devices()[1]["Blackberry PlayBook"])
   asyncio.run(main(first_name="testGreen", last_name="testG", street_address="test", city="test", zipp="85306", phone="8545214523", email="ds45s@gmail.com"))
   # print(playwright_devices())
   # print(genderize('John'))
