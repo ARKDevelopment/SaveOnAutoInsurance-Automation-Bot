@@ -21,24 +21,23 @@ async def emulated_browser(playwright, proxy=None):
   playwright_device_list = playwright_devices()
   device_list = playwright_device_list[0]
 
-  global random_device
   random_device = random.choice(device_list)
+  # print(random_device)
+  yield random_device
   # random_device = device_list[9]
-  print(random_device)
   
   device = playwright.devices[random_device]
-  print(random_device)
   # device.pop("viewport")
   # print(device)
   # system = 
   # browser = await playwright.chromium.launch(headless=False)
   browser = await playwright[playwright_device_list[1][random_device]["defaultBrowserType"]].launch(headless=False)
-  print(random_device)
   
-  return await browser.new_context(**device, 
+  yield await browser.new_context(**device, 
     proxy={**proxy} if proxy else None,
     # viewport={"width": 800, "height": 900}
   )
+  
   
 
 async def random_selector(page, selector):
@@ -68,10 +67,13 @@ async def scroller(page, wait):
 
 async def main(first_name, last_name, street_address, city, zipp, phone, email):
   async with async_playwright() as p:
-    browser = await emulated_browser(
+    device_setting = emulated_browser(
       p, 
       proxy=proxyfy(zipp, city)
     )
+    random_device = await device_setting.__anext__()
+    print(random_device)
+    browser = await device_setting.__anext__()
 
     page = await browser.new_page()
     await page.goto("http://auto.saveyourinsurance.com")
