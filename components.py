@@ -60,12 +60,12 @@ def froxy_proxy(state, city):
     try:
         password = f'wifi;us;;{state};{city}'
         proxies = {"https" : f'http://XLdek13TDI94zkFC:{password}@proxy.froxy.com:{port}'}
-        r = requests.get("https://api.ipify.org", proxies=proxies)
+        r = requests.get("https://ifconfig.me", proxies=proxies)
     except requests.exceptions.ProxyError:
         try:
             password = f'wifi;us;;{state};'
             proxies = {"https" : f'http://XLdek13TDI94zkFC:{password}@proxy.froxy.com:{port}'}
-            r = requests.get("https://api.ipify.org", proxies=proxies)
+            r = requests.get("https://ifconfig.me", proxies=proxies)
         except requests.exceptions.ProxyError:
             return
     return {
