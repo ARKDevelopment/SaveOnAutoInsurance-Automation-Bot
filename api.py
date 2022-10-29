@@ -3,6 +3,7 @@ from fastapi import FastAPI, WebSocket, HTTPException
 from fastapi.responses import HTMLResponse
 from starlette.responses import FileResponse
 from pydantic import BaseModel
+from enum import Enum
 import components
 
 
@@ -16,11 +17,27 @@ for table in ["queue","errors"]:
     id TEXT,
     first_name TEXT,
     last_name TEXT,
+    dob TEXT,
+    gender TEXT,
     street_address TEXT,
     city TEXT,
     zip TEXT,
     phone TEXT,
     email TEXT,
+    education TEXT,
+    ocuupation TEXT,
+    rating TEXT,
+    marriege TEXT,
+    licensed TEXT,
+    filing TEXT,
+    tickets TEXT,
+    expiraion TEXT,
+    covered TEXT,
+    homeowner TEXT,
+    year TEXT,
+    make TEXT,
+    model TEXT,
+    insuredform TEXT,
     date DATE DEFAULT CURRENT_DATE,
     time TIME DEFAULT CURRENT_TIME
         ); """
@@ -30,18 +47,26 @@ cur.execute("""CREATE TABLE IF NOT EXISTS log (
     id TEXT,
     first_name TEXT,
     last_name TEXT,
+    dob TEXT,
+    gender TEXT,
     street_address TEXT,
     zip TEXT,
     phone TEXT,
     email TEXT,
+    education TEXT,
+    ocuupation TEXT,
+    rating TEXT,
+    marriege TEXT,
+    licensed TEXT,
+    filing TEXT,
+    tickets TEXT,
+    expiraion TEXT,
+    covered TEXT,
+    homeowner TEXT,
     year TEXT,
     make TEXT,
     model TEXT,
     insuredform TEXT,
-    dob TEXT,
-    gender TEXT,
-    education TEXT,
-    rating TEXT,
     device TEXT,
     ip TEXT,
     status TEXT,
@@ -54,50 +79,153 @@ conn.commit()
 conn.close()
 
 
+class Gender(Enum):
+    blank = ""
+    male = "Male"
+    female = "Female"
+
+class Education(Enum):
+    blank = ""
+    less_high_school = "Less Than High School"
+    some_high_school = "Some or No High School"
+    high_school = "High School Diploma"
+    some_college = "Some College"
+    associate_degree = "Associate Degree"
+    bachelor_degree = "Bachelor Degree"
+    master_degree = "Master Degree"
+    docorate_degree = "Doctorate Degree"
+    other = "Other"
+
+class YesNo(Enum):
+    blank = ""
+    yes = "Yes"
+    no = "No"
+
+class Rating(Enum):
+    blank = ""
+    poor = "Poor"
+    fair = "Fair"
+    good = "Good"
+    average = "Average"
+    unsure = "Unsure"
+    excellent = "Excellent"
+    superior = "Superior"
+
+class Covered(Enum):
+    blank = ""
+    less_six_months = "Less Than 6 months"
+    six_months = "6 Months"
+    one_year = "1 Year"
+    two_year = "2 Years"
+    three_year = "3 Years"
+    three_five_year = "3-5 Years"
+    more_fix_year = "More Than 5 Years"
+
+
 class AutoInsurance(BaseModel):
     first_name: str = ""
     last_name: str = ""
+    dob: str = ""
+    gender: Gender
     street_address: str = ""
     city: str = ""
     zipp: str = ""
     phone: str = ""
     email: str = ""
+    education: Education
+    occupation: str = ""
+    rating: Rating
+    married: YesNo
+    licensed: YesNo
+    filing: YesNo
+    tickets: YesNo
+    expiration: str = ""
+    covered: Covered
+    homeowner: YesNo
+    year: str = ""
+    make: str = ""
+    model: str = ""
+    insuredform: str = ""
+    
 
 
 class AddToSQL:
-    def __init__(self, first_name, last_name, street_address, city, zipp, phone, email):
-        self.first_name = first_name
-        self.last_name = last_name
-        self.street_address = street_address
-        self.city = city
-        self.zipp = zipp
-        self.phone = phone
-        self.email = email
+    def __init__(self, autoinsurance):
+        self.details = autoinsurance
+
+    def validate_missing(self):
+        missing = []
+        if self.details.first_name == "":
+            missing.append("first_name")
+        if self.details.last_name == "":
+            missing.append("last_name")
+        if self.details.street_address == "":
+            missing.append("street_address")
+        if self.details.city == "":
+            missing.append("city")
+        if self.details.zipp == "":
+            missing.append("zipp")
+        if self.details.phone == "":
+            missing.append("phone")
+        if self.details.email == "":
+            missing.append("email")
 
 
     def exec(self, table, idd):
         con = sqlite3.connect('autoinsurance.db')
         self.cur = con.cursor()
         self.cur.execute(f"""INSERT INTO {table} (
-            id, 
-            first_name, 
-            last_name, 
-            street_address, 
-            city, 
-            zip, 
-            phone, 
-            email
+            id,
+            first_name,
+            last_name,
+            dob,
+            gender,
+            street_address,
+            city,
+            zip,
+            phone,
+            email,
+            education,
+            ocuupation,
+            rating,
+            marriege,
+            licensed,
+            filing,
+            tickets,
+            expiraion,
+            covered,
+            homeowner,
+            year,
+            make,
+            model,
+            insuredform
             ) 
-            VALUES ({"?, "*7}?)""", 
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             (
                 idd,
-                self.first_name,
-                self.last_name,
-                self.street_address,
-                self.city,
-                self.zipp,
-                self.phone,
-                self.email
+                self.details.first_name,
+                self.details.last_name,
+                self.details.dob,
+                self.details.gender.value,
+                self.details.street_address,
+                self.details.city,
+                self.details.zipp,
+                self.details.phone,
+                self.details.email,
+                self.details.education.value,
+                self.details.occupation,
+                self.details.rating.value,
+                self.details.married.value,
+                self.details.licensed.value,
+                self.details.filing.value,
+                self.details.tickets.value,
+                self.details.expiration,
+                self.details.covered.value,
+                self.details.homeowner.value,
+                self.details.year,
+                self.details.make,
+                self.details.model,
+                self.details.insuredform
             )
         )
         con.commit()
@@ -111,21 +239,53 @@ class AddToSQL:
             id,
             first_name,
             last_name,
+            dob,
+            gender,
             street_address,
             zip,
             phone,
             email,
+            education,
+            ocuupation,
+            rating,
+            marriege,
+            licensed,
+            filing,
+            tickets,
+            expiraion,
+            covered,
+            homeowner,
+            year,
+            make,
+            model,
+            insuredform,
             status
             )
-            values ({"?, "*7}?)""",
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             (
                 idd,
-                self.first_name,
-                self.last_name,
-                self.street_address,
-                self.zipp,
-                self.phone,
-                self.email,
+                self.details.first_name,
+                self.details.last_name,
+                self.details.dob,
+                self.details.gender.value,
+                self.details.street_address,
+                self.details.zipp,
+                self.details.phone,
+                self.details.email,
+                self.details.education.value,
+                self.details.occupation,
+                self.details.rating.value,
+                self.details.married.value,
+                self.details.licensed.value,
+                self.details.filing.value,
+                self.details.tickets.value,
+                self.details.expiration,
+                self.details.covered.value,
+                self.details.homeowner.value,
+                self.details.year,
+                self.details.make,
+                self.details.model,
+                self.details.insuredform,
                 status
             )
         )
@@ -142,26 +302,34 @@ def sql_to_csv(name, funct):
         writer = csv.writer(f)
         writer.writerow(
             [
-                "Id",
-                "First Name",
-                "Last Name",
-                "Street Address",
+                "id",
+                "first_name",
+                "last_name",
+                "dob",
+                "gender",
+                "street_address",
                 "zip",
-                "Phone",
+                "phone",
                 "email",
-                "Year",
-                "Make",
-                "Model",
-                "Insured From",
-                "DOB",
-                "Gender",
-                "Education",
-                "Rating",
-                "Device",
-                "Ip",
-                "Status",
-                "Date",
-                "Time"
+                "education",
+                "ocuupation",
+                "rating",
+                "marriege",
+                "licensed",
+                "filing",
+                "tickets",
+                "expiraion",
+                "covered",
+                "homeowner",
+                "year",
+                "make",
+                "model",
+                "insuredform",
+                "device",
+                "ip",
+                "status",
+                "date",
+                "time"
             ]
         )
 
@@ -170,6 +338,8 @@ def sql_to_csv(name, funct):
 
     con.close()
 
+def verifaction():
+    pass
 
 @app.get("/")
 async def get():
@@ -230,16 +400,17 @@ def list_view(table):
 
 @app.post('/add-to-queue')
 async def automate(auto_insurance: AutoInsurance):
+    print(auto_insurance.gender.value)
     idd = str(uuid.uuid4())
-    add_to_sql = AddToSQL(auto_insurance.first_name, auto_insurance.last_name, auto_insurance.street_address, auto_insurance.city, auto_insurance.zipp, auto_insurance.phone, auto_insurance.email)
+    add_to_sql = AddToSQL(auto_insurance)
 
-    missing_items = [k for k,v in auto_insurance.dict().items() if v == ""]
+    missing_items = add_to_sql.validate_missing()
     print(auto_insurance.dict().items())
     if len(missing_items) > 0:
         msg = "Missing " + ", ".join(missing_items)
         add_to_sql.exec("errors", msg)
         add_to_sql.log("errors", msg, "x")
-        raise HTTPException(status_code=400, detail="Missing " + ", ".join(missing_items))
+        raise HTTPException(status_code=404, detail="Missing " + ", ".join(missing_items))
     
     if not components.email_verified(auto_insurance.email): 
         add_to_sql.exec("errors", "Invalid Email")
