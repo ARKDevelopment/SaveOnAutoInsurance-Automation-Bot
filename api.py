@@ -2,9 +2,8 @@ import csv, sqlite3, uuid, pandas, datetime
 from fastapi import FastAPI, WebSocket, HTTPException
 from fastapi.responses import HTMLResponse
 from starlette.responses import FileResponse
-from pydantic import BaseModel
-from enum import Enum
 import components
+from components import Model as AutoInsurance
 
 
 app = FastAPI()
@@ -79,79 +78,14 @@ conn.commit()
 conn.close()
 
 
-class Gender(Enum):
-    blank = ""
-    male = "Male"
-    female = "Female"
 
-class Education(Enum):
-    blank = ""
-    less_high_school = "Less Than High School"
-    some_high_school = "Some or No High School"
-    high_school = "High School Diploma"
-    some_college = "Some College"
-    associate_degree = "Associate Degree"
-    bachelor_degree = "Bachelor Degree"
-    master_degree = "Master Degree"
-    docorate_degree = "Doctorate Degree"
-    other = "Other"
-
-class YesNo(Enum):
-    blank = ""
-    yes = "Yes"
-    no = "No"
-
-class Rating(Enum):
-    blank = ""
-    poor = "Poor"
-    fair = "Fair"
-    good = "Good"
-    average = "Average"
-    unsure = "Unsure"
-    excellent = "Excellent"
-    superior = "Superior"
-
-class Covered(Enum):
-    blank = ""
-    less_six_months = "Less Than 6 months"
-    six_months = "6 Months"
-    one_year = "1 Year"
-    two_year = "2 Years"
-    three_year = "3 Years"
-    three_five_year = "3-5 Years"
-    more_fix_year = "More Than 5 Years"
-
-
-class AutoInsurance(BaseModel):
-    first_name: str = ""
-    last_name: str = ""
-    dob: str = ""
-    gender: Gender
-    street_address: str = ""
-    city: str = ""
-    zipp: str = ""
-    phone: str = ""
-    email: str = ""
-    education: Education
-    occupation: str = ""
-    rating: Rating
-    married: YesNo
-    licensed: YesNo
-    filing: YesNo
-    tickets: YesNo
-    expiration: str = ""
-    covered: Covered
-    homeowner: YesNo
-    year: str = ""
-    make: str = ""
-    model: str = ""
-    insuredform: str = ""
     
 
 
 class AddToSQL:
-    def __init__(self, autoinsurance):
+    def __init__(self, autoinsurance: AutoInsurance):
         self.details = autoinsurance
+        print(self.details)
 
     def validate_missing(self):
         missing = []
@@ -169,6 +103,7 @@ class AddToSQL:
             missing.append("phone")
         if self.details.email == "":
             missing.append("email")
+        return missing
 
 
     def exec(self, table, idd):
@@ -338,8 +273,6 @@ def sql_to_csv(name, funct):
 
     con.close()
 
-def verifaction():
-    pass
 
 @app.get("/")
 async def get():
@@ -400,12 +333,12 @@ def list_view(table):
 
 @app.post('/add-to-queue')
 async def automate(auto_insurance: AutoInsurance):
-    print(auto_insurance.gender.value)
+    # print(auto_insurance)
     idd = str(uuid.uuid4())
     add_to_sql = AddToSQL(auto_insurance)
 
     missing_items = add_to_sql.validate_missing()
-    print(auto_insurance.dict().items())
+    # print(auto_insurance.dict().items())
     if len(missing_items) > 0:
         msg = "Missing " + ", ".join(missing_items)
         add_to_sql.exec("errors", msg)

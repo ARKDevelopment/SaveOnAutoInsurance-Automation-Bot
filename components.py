@@ -1,6 +1,76 @@
+from pydantic import BaseModel
+from enum import Enum
 import random
 import re
 import requests
+
+
+class Gender(Enum):
+    blank = ""
+    male = "Male"
+    female = "Female"
+
+class Education(Enum):
+    blank = ""
+    less_high_school = "Less Than High School"
+    some_high_school = "Some or No High School"
+    high_school = "High School Diploma"
+    some_college = "Some College"
+    associate_degree = "Associate Degree"
+    bachelor_degree = "Bachelor Degree"
+    master_degree = "Master Degree"
+    docorate_degree = "Doctorate Degree"
+    other = "Other"
+
+class YesNo(Enum):
+    blank = ""
+    yes = "Yes"
+    no = "No"
+
+class Rating(Enum):
+    blank = ""
+    poor = "Poor"
+    fair = "Fair"
+    good = "Good"
+    average = "Average"
+    unsure = "Unsure"
+    excellent = "Excellent"
+    superior = "Superior"
+
+class Covered(Enum):
+    blank = ""
+    less_six_months = "Less Than 6 months"
+    six_months = "6 Months"
+    one_year = "1 Year"
+    two_year = "2 Years"
+    three_year = "3 Years"
+    three_five_year = "3-5 Years"
+    more_fix_year = "More Than 5 Years"
+
+class Model(BaseModel):
+    year: str = ""
+    make: str = ""
+    model: str = ""
+    insuredform: str = ""
+    first_name: str = ""
+    last_name: str = ""
+    dob: str = ""
+    gender: Gender | None = Gender.blank
+    street_address: str = ""
+    city: str = ""
+    zipp: str = ""
+    phone: str = ""
+    email: str = "" 
+    education: Education | None = Education.blank
+    occupation: str = ""
+    rating: Rating | None = Rating.blank
+    married: YesNo | None = YesNo.blank
+    licensed: YesNo | None = YesNo.blank
+    filling: YesNo | None = YesNo.blank
+    tickets: YesNo | None = YesNo.blank
+    expiration: str = ""
+    covered: Covered | None = Covered.blank
+    homeowner: YesNo | None = YesNo.blank
 
 
 percent_html = """

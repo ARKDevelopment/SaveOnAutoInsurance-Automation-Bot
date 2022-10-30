@@ -1,6 +1,7 @@
 import asyncio, random, datetime, requests, json
+from numpy import append
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError 
-from components import proxyfy
+from components import proxyfy, Model
 
 
 def genderize(name):
@@ -40,7 +41,7 @@ async def emulated_browser(playwright, proxy=None):
   
   
 
-async def random_selector(page, selector):
+async def random_selector(page, selector:str):
   item = await page.query_selector_all(f'{selector} > option')
   item = item[1:]
   item = random.choice(item)
@@ -64,15 +65,24 @@ async def scroller(page, wait):
       await page.wait_for_timeout(rem)
       wait -= rem
 
+async def optional_option(page, selector:str, value:str):
+  if value:
+    await page.select_option(selector, value)
+    return value
+  return ""
+  
 
-async def main(first_name, last_name, street_address, city, zipp, phone, email):
+
+async def main(client: Model):
   async with async_playwright() as p:
     device_setting = emulated_browser(
       p, 
-      proxy=proxyfy(zipp, city)
+      proxy= None#proxyfy(client.zipp, client.city)
     )
+
     random_device = await device_setting.__anext__()
     print(random_device)
+    
     browser = await device_setting.__anext__()
 
     page = await browser.new_page()
@@ -103,22 +113,27 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
 
     await scroller(page, wait)
 
-    year = random.randint(2012, int(datetime.datetime.today().year))
+    year = client.year or str(random.randint(2012, int(datetime.datetime.today().year)))
     yr = await page.query_selector('#year')
     await yr.scroll_into_view_if_needed()
-    await page.select_option('#year', str(year))
+    await page.select_option('#year', year)
     await page.evaluate('loadVehiclMakes()')
     await page.wait_for_timeout(random.randint(2000, 4000))
 
-    
-    make = await random_selector(page, '#make')
+    make = await optional_option(page, '#make', client.make)
+    if not make:
+        make = await random_selector(page, '#make')
     await page.evaluate('loadModels()')
     await page.wait_for_timeout(random.randint(2000, 4000))
 
-    model = await random_selector(page, '#model')
+    model = await optional_option(page, '#model', client.model)
+    if not model:
+      model = await random_selector(page, '#model')
     await page.wait_for_timeout(random.randint(2000, 4000))
 
-    insuredform = await random_selector(page, '#insuredform')
+    insuredform = await optional_option(page, '#insuredform', client.insuredform)
+    if not insuredform:
+      insuredform = await random_selector(page, '#insuredform')
 
     await page.check('#leadid_tcpa_disclosure')
     submit_button = await page.click('#submit')
@@ -127,10 +142,10 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     print("PAGE 2")
     await page.wait_for_timeout(random.randint(4000, 6000))
 
-    await page.type('#firstname', first_name, delay=random.randint(20, 120))
+    await page.type('#firstname', client.first_name, delay=random.randint(20, 120))
     await page.wait_for_timeout(random.randint(2000, 4000))
 
-    await page.type('#lastname', last_name, delay=random.randint(20, 120))
+    await page.type('#lastname', client.last_name, delay=random.randint(20, 120))
     await page.wait_for_timeout(random.randint(2000, 4000))
     
     month = random.randint(1,12)
@@ -140,28 +155,28 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     day = day if len(str(day)) > 1 else f"0{day}"
 
     year = int(datetime.datetime.today().year) - random.randint(23, 61)
-    dob = "/".join(map(str, [month,day,year]))
+    dob = client.dob or "/".join(map(str, [month,day,year]))
     await page.type('#dateofbirth', dob, delay=random.randint(90, 200))
     await page.wait_for_timeout(random.randint(2000, 4000))
 
-
     try:
-      gender = genderize(first_name)
+      gender = genderize(client.first_name)
     except NameError:
       gender = "Male"
+    gender = client.gender.value or gender
     await page.select_option('#gender', gender)
     await page.wait_for_timeout(random.randint(2000, 4000))
 
-    await page.type('#streetaddress', street_address, delay=random.randint(70, 200))
+    await page.type('#streetaddress', client.street_address, delay=random.randint(70, 200))
     await page.wait_for_timeout(random.randint(2000, 4000))
 
-    await page.type('#zip', zipp, delay=random.randint(20, 120))
+    await page.type('#zip', client.zipp, delay=random.randint(20, 120))
     await page.wait_for_timeout(random.randint(2000, 4000))
 
-    await page.type('#phone', phone, delay=random.randint(20, 120))
+    await page.type('#phone', client.phone, delay=random.randint(20, 120))
     await page.wait_for_timeout(random.randint(2000, 4000))
 
-    await page.type('#email', email, delay=random.randint(20, 120))
+    await page.type('#email', client.email, delay=random.randint(20, 120))
 
     await page.check('#liketoreceive')
 
@@ -173,18 +188,45 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
     edu = await page.query_selector('#education')
     await edu.scroll_into_view_if_needed()
 
-    education = await random_selector(page, '#education')
+    education = await optional_option(page, '#education', client.education.value)
+    if not education: 
+      education = await random_selector(page, '#education')
     await page.wait_for_timeout(random.randint(2000, 4000))
 
-    rating = random.choice(['Good', 'Excellent'])
+    occupation = await optional_option(page, "#occupation", client.occupation)
+
+    rating = client.rating.value or random.choice(['Good', 'Excellent'])
     await page.select_option('#creditrating', rating)
     await page.wait_for_timeout(random.randint(2000, 4000))
 
-    await page.select_option('#married', "No")
+    married = client.rating.value or "No"
+    await page.select_option('#married', married)
     await page.wait_for_timeout(random.randint(2000, 4000))
 
-    # await page.select_option('#tickets', "No")
-    # await page.wait_for_timeout(random.randint(1000, 2000))
+    licensed = await optional_option(page, "#licence", client.licensed.value)
+    if not licensed:
+      await page.wait_for_timeout(random.randint(1000, 2000))
+
+
+    filling = await optional_option(page, "#filling", client.filling.value)
+    if not filling:
+      await page.wait_for_timeout(random.randint(1000, 2000))
+    
+    tickets = await optional_option(page, "#tickets", client.tickets.value)
+    if not tickets:
+      await page.wait_for_timeout(random.randint(1000, 2000))
+
+    expiration = await optional_option(page, "#policy", client.expiration)
+    if not expiration:
+      await page.wait_for_timeout(random.randint(1000, 2000))
+
+    covered = await optional_option(page, "#covered", client.covered.value)
+    if not covered:
+      await page.wait_for_timeout(random.randint(1000, 2000))
+
+    homeowner = await optional_option(page, "#ownhome", client.homeowner.value)
+    if not homeowner:
+      await page.wait_for_timeout(random.randint(1000, 2000))
 
     submit_button = await page.query_selector('#submit >> nth=1')
     await submit_button.scroll_into_view_if_needed()
@@ -203,11 +245,44 @@ async def main(first_name, last_name, street_address, city, zipp, phone, email):
 
     print("Done")
 
-    return year, make, model, insuredform, dob, gender, education, rating, random_device, data[0][1]["ipuser"]
+    print({
+    "year": year,
+    "make": make,
+    "model": model,
+    "insuredform": insuredform,
+    "first_name": client.first_name,
+    "last_name": client.last_name,
+    "dob": dob,
+    "gender":  gender,
+    "street_address": client.street_address,
+    "city": client.city,
+    "zipp": client.zipp,
+    "phone": client.phone,
+    "email":  client.email,
+    "education": education,
+    "occupation": occupation,
+    "rating": rating,
+    "married": married,
+    "licensed": licensed,
+    "filling": filling,
+    "tickets": tickets,
+    "expiration": expiration,
+    "covered": covered,
+    "homeowner": homeowner,
+    "device": random_device, 
+    "ip": data[0][1]["ipuser"]
+    })
 
 
 if __name__ == "__main__":
+  # pass
+  # asyncio.run(optional_options(ziptostate, 12345, "j"))
+  # print()
   # print(playwright_devices()[1]["Blackberry PlayBook"])
-  asyncio.run(main(first_name="testGreen", last_name="testG", street_address="test", city="test", zipp="85306", phone="8545214523", email="ds45s@gmail.com"))
+  test_data = {"first_name":"testGreen", "last_name":"testG", "street_address":"test", "city":"test", "zipp":"85306", "phone":"8545214523", "email":"ds45s@gmail.com"}
+  def test(data: Model):
+    print(data)
+  test(Model(**test_data))
+  asyncio.run(main(Model(**test_data)))
   # print(playwright_devices())
   # print(genderize('John'))
