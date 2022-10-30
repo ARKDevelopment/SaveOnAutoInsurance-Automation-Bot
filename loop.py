@@ -1,9 +1,8 @@
-import os
 import time
-from uuid import uuid4
 from main import main
 import asyncio
 import sqlite3
+from components import Model 
 
 conn = sqlite3.connect('autoinsurance.db')
 cur = conn.cursor()
@@ -20,13 +19,13 @@ cur.execute("""CREATE TABLE IF NOT EXISTS log (
   phone TEXT,
   email TEXT,
   education TEXT,
-  ocuupation TEXT,
+  occupation TEXT,
   rating TEXT,
   marriege TEXT,
   licensed TEXT,
-  filing TEXT,
+  filling TEXT,
   tickets TEXT,
-  expiraion TEXT,
+  expiration TEXT,
   covered TEXT,
   homeowner TEXT,
   year TEXT,
@@ -41,34 +40,86 @@ cur.execute("""CREATE TABLE IF NOT EXISTS log (
 ); """
 )
 
-
 async def sql_delete(item):
-  idd = item[0]
+  items = array_to_dict(item)
+  idd = items["id"]
   print(idd)
-  print(item)
+  print(items)
   try:
     # Check and delete old log
-    cur.execute("DELETE FROM log WHERE id = ?", (idd,))
-    conn.commit()
+    # cur.execute("DELETE FROM log WHERE id = ?", (idd,))
+    # conn.commit()
 
     # Inserting into log and making random data unknown
-    cur.execute("INSERT INTO log (id, first_name, last_name, street_address, zip, phone, email, year, make, model, insuredform, dob, gender, device, ip, education, rating, status) VAlUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
-                                  (item[0],item[1],item[2],item[3],item[5],item[6],item[7], "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", 'running'))
+    cur.execute("UPDATE log SET status = ? WHERE id = ?", ('running', idd,))
+    # cur.execute("INSERT INTO log (id, first_name, last_name, street_address, zip, phone, email, year, make, model, insuredform, dob, gender, device, ip, education, rating, status) VAlUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
+    #                               (item[0],item[1],item[2],item[3],item[5],item[6],item[7], "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", 'running'))
     conn.commit()
 
-    random_values = await main(*list(item[1:][:7]))
+    values = await main(Model(**items))
 
     # Update Random Values into log
-    cur.execute("UPDATE log SET year=?, make=?, model=?, insuredform=?, dob=?, gender=?, education=?, rating=?, device=?, ip=?, status=? WHERE id=?", 
-    (random_values[0], random_values[1], random_values[2], random_values[3], random_values[4], random_values[5], random_values[6], random_values[7], random_values[8], random_values[9], 'completed', idd,))
-    # cur.execute("UPDATE log (id, first_name, last_name, street_address, zip, phone, email, year, make, model, insured, device, status) VAlUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (*item, *random_values, 'queued'))
+    cur.execute("""UPDATE log SET  
+      first_name = ?,
+      last_name = ?,
+      dob = ?,
+      gender = ?,
+      street_address = ?,
+      zip = ?,
+      phone = ?,
+      email = ?,
+      education = ?,
+      occupation = ?,
+      rating = ?,
+      marriege = ?,
+      licensed = ?,
+      filling = ?,
+      tickets = ?,
+      expiration = ?,
+      covered = ?,
+      homeowner = ?,
+      year = ?,
+      make = ?,
+      model = ?,
+      insuredform = ?,
+      device = ?,
+      ip = ?,
+      status = ?
+      WHERE id=?""", 
+    (
+      values["first_name"],
+      values["last_name"],
+      values["dob"],
+      values["gender"],
+      values["street_address"],
+      values["zipp"],
+      values["phone"],
+      values["email"],
+      values["education"],
+      values["occupation"],
+      values["rating"],
+      values["married"],
+      values["licensed"],
+      values["filling"],
+      values["tickets"],
+      values["expiration"],
+      values["covered"],
+      values["homeowner"],
+      values["year"],
+      values["make"],
+      values["model"],
+      values["insuredform"],
+      values["device"],
+      values["ip"],
+      "success",
+      idd,))
     conn.commit()
 
     # Remove from queue
     cur.execute("DELETE FROM queue WHERE id = ?", (idd,))
 
     # Update log
-    cur.execute("UPDATE log SET status = ? WHERE id = ?", ('success', idd,))
+    # cur.execute("UPDATE log SET status = ? WHERE id = ?", ('success', idd,))
     conn.commit()
     return True
     
@@ -83,6 +134,37 @@ async def sql_delete(item):
 
 async def send_to_process(queue_items):
   await asyncio.gather(*[sql_delete(x) for x in queue_items])
+
+def array_to_dict(queue_item: list):
+  key =  [
+    "id",
+    "first_name",
+    "last_name",
+    "dob",
+    "gender",
+    "street_address",
+    "city",
+    "zipp",
+    "phone",
+    "email",
+    "education",
+    "ocuupation",
+    "rating",
+    "marriege",
+    "licensed",
+    "filling",
+    "tickets",
+    "expiraion",
+    "covered",
+    "homeowner",
+    "year",
+    "make",
+    "model",
+    "insuredform",
+    "date",
+    "time"]
+
+  return dict(zip(key, queue_item))
 
 def main_loop():
   while True:
@@ -112,6 +194,7 @@ def main_loop():
 
 if __name__ == "__main__":
   try:
+    # array_to_dict(('4841f142-fb78-490b-a739-78a403ac0e72', 'w', 'w', '', '', '11', 'aa', '12345', '9191', 'aa@ss.com', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '2022-10-30', '07:39:29'))
     main_loop()
   except KeyboardInterrupt:
     exit()

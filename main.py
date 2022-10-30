@@ -245,7 +245,7 @@ async def main(client: Model):
 
     print("Done")
 
-    print({
+    return {
     "year": year,
     "make": make,
     "model": model,
@@ -271,7 +271,7 @@ async def main(client: Model):
     "homeowner": homeowner,
     "device": random_device, 
     "ip": data[0][1]["ipuser"]
-    })
+    }
 
 
 if __name__ == "__main__":
