@@ -42,6 +42,7 @@ cur.execute("""CREATE TABLE IF NOT EXISTS log (
 
 async def sql_delete(item):
   items = array_to_dict(item)
+  print(items)
   idd = items["id"]
   print(idd)
   print(items)
@@ -150,7 +151,7 @@ def array_to_dict(queue_item: list):
     "education",
     "ocuupation",
     "rating",
-    "marriege",
+    "married",
     "licensed",
     "filling",
     "tickets",
