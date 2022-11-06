@@ -157,7 +157,7 @@ async def main(client: Model):
     day = day if len(str(day)) > 1 else f"0{day}"
 
     year = int(datetime.datetime.today().year) - random.randint(23, 61)
-    dob = client.dob or "/".join(map(str, [month,day,year]))
+    dob = client.dob.replace("-", "/") or "/".join(map(str, [month,day,year]))
     await page.type('#dateofbirth', dob, delay=random.randint(90, 200))
     await page.wait_for_timeout(random.randint(2000, 4000))
 
