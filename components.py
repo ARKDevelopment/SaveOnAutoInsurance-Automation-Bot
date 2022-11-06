@@ -43,7 +43,7 @@ class Model(BaseModel):
     first_name: str = ""
     last_name: str = ""
     dob: str = ""
-    gender: Gender | None = Gender.blank
+    gender: str = ""
     street_address: str = ""
     city: str = ""
     zipp: str = ""
