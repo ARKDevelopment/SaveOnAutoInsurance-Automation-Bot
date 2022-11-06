@@ -10,18 +10,6 @@ class Gender(Enum):
     male = "Male"
     female = "Female"
 
-class Education(Enum):
-    blank = ""
-    less_high_school = "Less Than High School"
-    some_high_school = "Some or No High School"
-    high_school = "High School Diploma"
-    some_college = "Some College"
-    associate_degree = "Associate Degree"
-    bachelor_degree = "Bachelor Degree"
-    master_degree = "Master Degree"
-    docorate_degree = "Doctorate Degree"
-    other = "Other"
-
 class YesNo(Enum):
     blank = ""
     yes = "Yes"
@@ -61,16 +49,16 @@ class Model(BaseModel):
     zipp: str = ""
     phone: str = ""
     email: str = "" 
-    education: Education | None = Education.blank
+    education: str = ""
     occupation: str = ""
-    rating: Rating | None = Rating.blank
-    married: YesNo | None = YesNo.blank
-    licensed: YesNo | None = YesNo.blank
-    filling: YesNo | None = YesNo.blank
-    tickets: YesNo | None = YesNo.blank
+    rating: str = ""
+    married: str = ""
+    licensed: str = ""
+    filling: str = ""
+    tickets: str = ""
     expiration: str = ""
-    covered: Covered | None = Covered.blank
-    homeowner: YesNo | None = YesNo.blank
+    covered: str = ""
+    homeowner: str = ""
 
 
 percent_html = """

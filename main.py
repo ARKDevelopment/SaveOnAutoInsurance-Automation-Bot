@@ -1,5 +1,4 @@
 import asyncio, random, datetime, requests, json
-from numpy import append
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError 
 from components import proxyfy, Model
 
@@ -67,7 +66,10 @@ async def scroller(page, wait):
 
 async def optional_option(page, selector:str, value:str):
   if value:
-    await page.select_option(selector, value)
+    try:
+      await page.select_option(selector, value)
+    except PlaywrightTimeoutError:
+      return ""
     return value
   return ""
   
@@ -77,7 +79,7 @@ async def main(client: Model):
   async with async_playwright() as p:
     device_setting = emulated_browser(
       p, 
-      proxy= None#proxyfy(client.zipp, client.city)
+      proxy= proxyfy(client.zipp, client.city)
     )
 
     random_device = await device_setting.__anext__()
@@ -163,7 +165,7 @@ async def main(client: Model):
       gender = genderize(client.first_name)
     except NameError:
       gender = "Male"
-    gender = client.gender.value or gender
+    gender = client.gender or gender
     await page.select_option('#gender', gender)
     await page.wait_for_timeout(random.randint(2000, 4000))
 
@@ -188,31 +190,31 @@ async def main(client: Model):
     edu = await page.query_selector('#education')
     await edu.scroll_into_view_if_needed()
 
-    education = await optional_option(page, '#education', client.education.value)
+    education = await optional_option(page, '#education', client.education)
     if not education: 
       education = await random_selector(page, '#education')
     await page.wait_for_timeout(random.randint(2000, 4000))
 
     occupation = await optional_option(page, "#occupation", client.occupation)
 
-    rating = client.rating.value or random.choice(['Good', 'Excellent'])
+    rating = client.rating or random.choice(['Good', 'Excellent'])
     await page.select_option('#creditrating', rating)
     await page.wait_for_timeout(random.randint(2000, 4000))
 
-    married = client.rating.value or "No"
+    married = client.rating or "No"
     await page.select_option('#married', married)
     await page.wait_for_timeout(random.randint(2000, 4000))
 
-    licensed = await optional_option(page, "#licence", client.licensed.value)
+    licensed = await optional_option(page, "#licence", client.licensed)
     if not licensed:
       await page.wait_for_timeout(random.randint(1000, 2000))
 
 
-    filling = await optional_option(page, "#filling", client.filling.value)
+    filling = await optional_option(page, "#filling", client.filling)
     if not filling:
       await page.wait_for_timeout(random.randint(1000, 2000))
     
-    tickets = await optional_option(page, "#tickets", client.tickets.value)
+    tickets = await optional_option(page, "#tickets", client.tickets)
     if not tickets:
       await page.wait_for_timeout(random.randint(1000, 2000))
 
@@ -220,11 +222,11 @@ async def main(client: Model):
     if not expiration:
       await page.wait_for_timeout(random.randint(1000, 2000))
 
-    covered = await optional_option(page, "#covered", client.covered.value)
+    covered = await optional_option(page, "#covered", client.covered)
     if not covered:
       await page.wait_for_timeout(random.randint(1000, 2000))
 
-    homeowner = await optional_option(page, "#ownhome", client.homeowner.value)
+    homeowner = await optional_option(page, "#ownhome", client.homeowner)
     if not homeowner:
       await page.wait_for_timeout(random.randint(1000, 2000))
 
