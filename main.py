@@ -197,12 +197,16 @@ async def main(client: Model):
 
     occupation = await optional_option(page, "#occupation", client.occupation)
 
-    rating = client.rating or random.choice(['Good', 'Excellent'])
-    await page.select_option('#creditrating', rating)
+    rating = optional_option(page, client.rating)
+    if not rating: 
+      rating = random.choice(['Good', 'Excellent'])
+      await page.select_option('#creditrating', rating)
     await page.wait_for_timeout(random.randint(2000, 4000))
 
-    married = client.rating or "No"
-    await page.select_option('#married', married)
+    married = optional_option(page, client.rating)
+    if not married:
+      married = "No"
+      await page.select_option('#married', married)
     await page.wait_for_timeout(random.randint(2000, 4000))
 
     licensed = await optional_option(page, "#licence", client.licensed)
