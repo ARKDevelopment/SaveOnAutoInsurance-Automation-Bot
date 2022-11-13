@@ -122,12 +122,12 @@ async def main(client: Model):
     yr = await page.query_selector('#year')
     await yr.scroll_into_view_if_needed()
     await page.select_option('#year', year)
+    yr = await random_selector(page, '#year')
     await page.evaluate('loadVehiclMakes()')
     await page.wait_for_timeout(random.randint(3000, 4000))
 
     make = await optional_option(page, '#make', client.make)
     if not make:
-        make = await random_selector(page, '#year')
         make = await random_selector(page, '#make')
     await page.evaluate('loadModels()')
     await page.wait_for_timeout(random.randint(2000, 4000))
