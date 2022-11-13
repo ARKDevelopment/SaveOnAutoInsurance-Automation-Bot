@@ -127,6 +127,7 @@ async def main(client: Model):
 
     make = await optional_option(page, '#make', client.make)
     if not make:
+        make = await random_selector(page, '#year')
         make = await random_selector(page, '#make')
     await page.evaluate('loadModels()')
     await page.wait_for_timeout(random.randint(2000, 4000))
