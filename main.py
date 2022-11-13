@@ -42,7 +42,7 @@ async def emulated_browser(playwright, proxy=None):
 
 async def random_selector(page, selector:str):
   item = await page.query_selector_all(f'{selector} > option')
-  assert await item.evaluate("node => node.innerText")
+  [await x.evaluate("node => node.innerText") for x in item]
   print(item)
   item = item[1:]
   item = random.choice(item)
