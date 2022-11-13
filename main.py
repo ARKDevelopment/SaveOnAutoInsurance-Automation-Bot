@@ -123,6 +123,7 @@ async def main(client: Model):
     await yr.scroll_into_view_if_needed()
     await page.select_option('#year', year)
     yr = await random_selector(page, '#year')
+    print(yr)
     await page.evaluate('loadVehiclMakes()')
     await page.wait_for_timeout(random.randint(3000, 4000))
 
