@@ -19,7 +19,7 @@ def playwright_devices():
 
 async def emulated_browser(playwright, proxy=None):
   playwright_device_list = playwright_devices()
-  device_list = playwright_device_list[0]
+  device_list = [x for x in playwright_device_list[0] if x]
 
   random_device = random.choice(device_list)
   # print(random_device)
