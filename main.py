@@ -79,7 +79,7 @@ async def main(client: Model):
   async with async_playwright() as p:
     device_setting = emulated_browser(
       p, 
-      proxy= proxyfy(client.zipp, client.city)
+      #proxy= proxyfy(client.zipp, client.city)
     )
 
     random_device = await device_setting.__anext__()
@@ -192,18 +192,18 @@ async def main(client: Model):
 
     education = await optional_option(page, '#education', client.education)
     if not education: 
-      education = await random_selector(page, '#education')
-    await page.wait_for_timeout(random.randint(2000, 4000))
+      await page.wait_for_timeout(random.randint(2000, 4000))
+      # education = await random_selector(page, '#education')
 
     occupation = await optional_option(page, "#occupation", client.occupation)
 
-    rating = optional_option(page, '#creditrating', client.rating)
+    rating = await optional_option(page, '#creditrating', client.rating)
     if not rating: 
       rating = random.choice(['Good', 'Excellent'])
       await page.select_option('#creditrating', rating)
     await page.wait_for_timeout(random.randint(2000, 4000))
 
-    married = optional_option(page, '#married', client.rating)
+    married = await optional_option(page, '#married', client.rating)
     if not married:
       married = "No"
       await page.select_option('#married', married)
