@@ -42,8 +42,6 @@ async def emulated_browser(playwright, proxy=None):
 
 async def random_selector(page, selector:str):
   item = await page.query_selector_all(f'{selector} > option')
-  [await x.evaluate("node => node.innerText") for x in item]
-  print(item)
   item = item[1:]
   item = random.choice(item)
   item = await item.get_attribute('value')
@@ -122,8 +120,6 @@ async def main(client: Model):
     yr = await page.query_selector('#year')
     await yr.scroll_into_view_if_needed()
     await page.select_option('#year', year)
-    yr = await random_selector(page, '#year')
-    print(yr)
     await page.evaluate('loadVehiclMakes()')
     await page.wait_for_timeout(random.randint(3000, 4000))
 
