@@ -204,35 +204,43 @@ async def main(client: Model):
       await page.select_option('#creditrating', rating)
     await page.wait_for_timeout(random.randint(2000, 4000))
 
-    married = await optional_option(page, '#married', client.rating)
+    married = await optional_option(page, '#maritalstatus', client.married)
     if not married:
-      married = "No"
-      await page.select_option('#married', married)
+      married = "Single"
+    await page.select_option('#maritalstatus', married)
     await page.wait_for_timeout(random.randint(2000, 4000))
 
     licensed = await optional_option(page, "#licence", client.licensed)
-    if not licensed:
+    if licensed:
       await page.wait_for_timeout(random.randint(1000, 2000))
 
 
     filling = await optional_option(page, "#filling", client.filling)
-    if not filling:
+    if filling:
       await page.wait_for_timeout(random.randint(1000, 2000))
     
     tickets = await optional_option(page, "#tickets", client.tickets)
-    if not tickets:
-      await page.wait_for_timeout(random.randint(1000, 2000))
-
-    expiration = await optional_option(page, "#policy", client.expiration)
-    if not expiration:
+    if tickets:
       await page.wait_for_timeout(random.randint(1000, 2000))
 
     covered = await optional_option(page, "#covered", client.covered)
-    if not covered:
+    if covered:
       await page.wait_for_timeout(random.randint(1000, 2000))
 
+    # expiration = await optional_option(page, "#policy", client.expiration)
+    # if expiration:
+    #   await page.wait_for_timeout(random.randint(1000, 2000))
+
+    if client.expiration:
+      await page.type('#policy', client.expiration, delay=random.randint(90, 200))
+      await page.wait_for_timeout(random.randint(2000, 4000))
+
+    if client.insuredsince:
+      await page.type('#insuredsince', client.insuredsince, delay=random.randint(90, 200))
+      await page.wait_for_timeout(random.randint(2000, 4000))
+
     homeowner = await optional_option(page, "#ownhome", client.homeowner)
-    if not homeowner:
+    if homeowner:
       await page.wait_for_timeout(random.randint(1000, 2000))
 
     submit_button = await page.query_selector('#submit >> nth=1')

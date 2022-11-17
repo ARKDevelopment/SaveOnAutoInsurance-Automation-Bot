@@ -57,6 +57,7 @@ class Model(BaseModel):
     filling: str = ""
     tickets: str = ""
     expiration: str = ""
+    insuredsince: str = ""
     covered: str = ""
     homeowner: str = ""
 
