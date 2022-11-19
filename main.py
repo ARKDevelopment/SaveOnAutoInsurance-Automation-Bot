@@ -223,9 +223,9 @@ async def main(client: Model):
     if tickets:
       await page.wait_for_timeout(random.randint(1000, 2000))
 
-    covered = await optional_option(page, "#covered", client.covered)
-    if covered:
-      await page.wait_for_timeout(random.randint(1000, 2000))
+    # covered = await optional_option(page, "#covered", client.covered)
+    # if covered:
+    #   await page.wait_for_timeout(random.randint(1000, 2000))
 
     # expiration = await optional_option(page, "#policy", client.expiration)
     # if expiration:
@@ -283,7 +283,6 @@ async def main(client: Model):
     "tickets": tickets,
     "expiration": client.expiration,
     "insuredsince": client.insuredsince,
-    "covered": covered,
     "homeowner": homeowner,
     "device": random_device, 
     "ip": data[0][1]["ipuser"]

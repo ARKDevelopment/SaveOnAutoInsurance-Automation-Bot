@@ -25,15 +25,6 @@ class Rating(Enum):
     excellent = "Excellent"
     superior = "Superior"
 
-class Covered(Enum):
-    blank = ""
-    less_six_months = "Less Than 6 months"
-    six_months = "6 Months"
-    one_year = "1 Year"
-    two_year = "2 Years"
-    three_year = "3 Years"
-    three_five_year = "3-5 Years"
-    more_fix_year = "More Than 5 Years"
 
 class Model(BaseModel):
     year: str = ""
@@ -58,7 +49,6 @@ class Model(BaseModel):
     tickets: str = ""
     expiration: str = ""
     insuredsince: str = ""
-    covered: str = ""
     homeowner: str = ""
 
 

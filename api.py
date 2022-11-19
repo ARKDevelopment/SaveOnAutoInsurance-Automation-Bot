@@ -32,7 +32,6 @@ for table in ["queue","errors"]:
     tickets TEXT,
     expiration TEXT,
     insuredsince TEXT,
-    covered TEXT,
     homeowner TEXT,
     year TEXT,
     make TEXT,
@@ -62,7 +61,6 @@ cur.execute("""CREATE TABLE IF NOT EXISTS log (
     tickets TEXT,
     expiration TEXT,
     insuredsince TEXT,
-    covered TEXT,
     homeowner TEXT,
     year TEXT,
     make TEXT,
@@ -131,14 +129,13 @@ class AddToSQL:
             tickets,
             expiration,
             insuredsince,
-            covered,
             homeowner,
             year,
             make,
             model,
             insuredform
             ) 
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             (
                 idd,
                 self.details.first_name,
@@ -159,7 +156,6 @@ class AddToSQL:
                 self.details.tickets,
                 self.details.expiration,
                 self.details.insuredsince,
-                self.details.covered,
                 self.details.homeowner,
                 self.details.year,
                 self.details.make,
@@ -193,7 +189,6 @@ class AddToSQL:
             tickets,
             expiration,
             insuredsince,
-            covered,
             homeowner,
             year,
             make,
@@ -201,7 +196,7 @@ class AddToSQL:
             insuredform,
             status
             )
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             (
                 idd,
                 self.details.first_name,
@@ -221,7 +216,6 @@ class AddToSQL:
                 self.details.tickets,
                 self.details.expiration,
                 self.details.insuredsince,
-                self.details.covered,
                 self.details.homeowner,
                 self.details.year,
                 self.details.make,
@@ -261,7 +255,6 @@ def sql_to_csv(name, funct):
                 "tickets",
                 "expiration",
                 "insuredsince",
-                "covered",
                 "homeowner",
                 "year",
                 "make",
