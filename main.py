@@ -167,7 +167,7 @@ async def main(client: Model):
     except NameError:
       gender = "Male"
     gender = client.gender or gender
-    await page.select_option('#gender', gender)
+    await page.select_option('#gender', gender.capitalize())
     await page.wait_for_timeout(random.randint(2000, 4000))
 
     await page.type('#streetaddress', client.street_address, delay=random.randint(70, 200))
