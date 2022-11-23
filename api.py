@@ -326,7 +326,7 @@ def list_view(table):
         # data_str = "<br>".join([str(cmd) for cmd in cmd])
         # data_str = " ".join([*cmd])
         con.close()
-        return HTMLResponse(data)
+        return data
     except KeyboardInterrupt:
         return HTMLResponse("<h1>Invalid Address</h1>")
 
