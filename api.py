@@ -322,11 +322,11 @@ def list_view(table):
         con = sqlite3.connect('autoinsurance.db')
         cur = con.cursor()
         cmd = cur.execute(f"SELECT * FROM {table}")
-        # data = cmd.fetchall()
-        data_str = "<br>".join([str(cmd) for cmd in cmd])
+        data = cmd.fetchall()
+        # data_str = "<br>".join([str(cmd) for cmd in cmd])
         # data_str = " ".join([*cmd])
         con.close()
-        return HTMLResponse(data_str)
+        return HTMLResponse(data)
     except KeyboardInterrupt:
         return HTMLResponse("<h1>Invalid Address</h1>")
 
