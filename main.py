@@ -251,8 +251,9 @@ async def main(client: Model):
     try:
       await submit_button.click(timeout=2000)
     except:
-      while data == []:
-        await page.wait_for_timeout(100)
+      pass
+    while data == []:
+      await page.wait_for_timeout(100)
 
     #PAGE 3
       await page.goto(f"http://auto.saveyourinsurance.com/submitDetails.php?{data[0][0]}", referer='http://auto.saveyourinsurance.com')
