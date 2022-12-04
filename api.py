@@ -103,7 +103,11 @@ class AddToSQL:
             missing.append("phone")
         if self.details.email == "":
             missing.append("email")
-        return missing
+        if len(missing) > 0:
+            return "Missing " + ", ".join
+        if int(self.details.year) < 1999:
+            return "Year Error"
+        return False
 
 
     def exec(self, table, idd):
@@ -338,10 +342,10 @@ async def automate(auto_insurance: AutoInsurance):
     idd = str(uuid.uuid4())
     add_to_sql = AddToSQL(auto_insurance)
 
-    missing_items = add_to_sql.validate_missing()
+    validation = add_to_sql.validate_missing()
     # print(auto_insurance.dict().items())
-    if len(missing_items) > 0:
-        msg = "Missing " + ", ".join(missing_items)
+    if validation:
+        msg = validation
         add_to_sql.exec("errors", msg)
         add_to_sql.log("errors", msg, "x")
         raise HTTPException(status_code=404, detail="Missing " + ", ".join(missing_items))
