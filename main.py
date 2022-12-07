@@ -80,7 +80,7 @@ async def main(client: Model):
   async with async_playwright() as p:
     device_setting = emulated_browser(
       p 
-      #proxy= proxyfy(client.zipp, client.city)
+      proxy= proxyfy(client.zipp, client.city)
     )
 
     random_device = await device_setting.__anext__()
