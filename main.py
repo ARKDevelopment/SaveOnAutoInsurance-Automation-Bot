@@ -78,9 +78,11 @@ async def optional_option(page, selector:str, value:str):
 async def main(client: Model):
   # print(client)
   async with async_playwright() as p:
+    proxy = proxyfy(client.zipp, client.city)
+    print(proxy)
     device_setting = emulated_browser(
       p, 
-      proxy= proxyfy(client.zipp, client.city)
+      proxy=proxy
     )
 
     random_device = await device_setting.__anext__()
