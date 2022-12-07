@@ -79,7 +79,7 @@ async def main(client: Model):
   # print(client)
   async with async_playwright() as p:
     device_setting = emulated_browser(
-      p 
+      p, 
       proxy= proxyfy(client.zipp, client.city)
     )
 
