@@ -164,11 +164,12 @@ async def main(client: Model):
     await page.type('#dateofbirth', dob, delay=random.randint(90, 200))
     await page.wait_for_timeout(random.randint(2000, 4000))
 
-    try:
-      gender = genderize(client.first_name)
-    except NameError:
-      gender = "Male"
-    gender = client.gender or gender
+    gender = client.gender
+    if not gender:
+      try:
+        gender = genderize(client.first_name)
+      except:
+        gender = "Male"
     await page.select_option('#gender', gender.capitalize())
     await page.wait_for_timeout(random.randint(2000, 4000))
 
@@ -293,6 +294,7 @@ async def main(client: Model):
 
 
 if __name__ == "__main__":
+  print(genderize("jhon"))
   # pass
   # asyncio.run(optional_options(ziptostate, 12345, "j"))
   # print()
@@ -323,9 +325,9 @@ if __name__ == "__main__":
   }
 
   # test_data = {"first_name":"testGreen", "last_name":"testG", "street_address":"test", "city":"test", "zipp":"85306", "phone":"8545214523", "email":"ds45s@gmail.com"}
-  def test(data: Model):
-    print(data)
-  test(Model(**test_data))
-  asyncio.run(main(Model(**test_data)))
+  # def test(data: Model):
+  #   print(data)
+  # test(Model(**test_data))
+  # asyncio.run(main(Model(**test_data)))
   # print(playwright_devices())
   # print(genderize('John'))
