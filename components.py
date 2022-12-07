@@ -135,9 +135,9 @@ def smart_proxy(state):
     for i in response.json():
         if i["location"] == state.title():
             return {"server":i["hostname"] + ":" + str(random.randint(*map(int, i["port_range"].replace(" ", "").split("-")))),
-                    "username": "sp55359177",
-                    "password": "sp55359177"}
-    return
+                    "username": "sp07531016",
+                    "password": "sp07531016"}
+    return None
 
     # print(response.json())
 

@@ -76,11 +76,11 @@ async def optional_option(page, selector:str, value:str):
 
 
 async def main(client: Model):
-  print(client)
+  # print(client)
   async with async_playwright() as p:
     device_setting = emulated_browser(
-      p, 
-      proxy= proxyfy(client.zipp, client.city)
+      p 
+      #proxy= proxyfy(client.zipp, client.city)
     )
 
     random_device = await device_setting.__anext__()
@@ -295,7 +295,32 @@ if __name__ == "__main__":
   # asyncio.run(optional_options(ziptostate, 12345, "j"))
   # print()
   # print(playwright_devices()[1]["Blackberry PlayBook"])
-  test_data = {"first_name":"testGreen", "last_name":"testG", "street_address":"test", "city":"test", "zipp":"85306", "phone":"8545214523", "email":"ds45s@gmail.com"}
+  test_data = {
+    "first_name": "ms",
+  	"last_name":"crosser",
+    "dob": "13-10-1979",
+    "gender":	"Female",
+    "street_adress": "nill",
+    "zip": "7933",
+    "phone": "7653628415",
+    "email": "mscrosser8415@gmail.com",
+    "education": "Associate Degree",
+    "occupation":"	Legal",	
+    "rating": "Good",	
+    "married": "Married",
+    "license": "Yes",
+    "filling": "Yes",
+    "tickets": "No",
+    "expiration": "13-06-2023",	
+    "insuredsince": "22-08-2005",	
+    "homeowner": "No",	
+    "year": "1990",	
+    "make": "NISSAN",	
+    "model": "MICRA",	
+    "insuredform": "Other"
+  }
+
+  # test_data = {"first_name":"testGreen", "last_name":"testG", "street_address":"test", "city":"test", "zipp":"85306", "phone":"8545214523", "email":"ds45s@gmail.com"}
   def test(data: Model):
     print(data)
   test(Model(**test_data))
