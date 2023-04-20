@@ -28,4 +28,4 @@ $ python -m playwright install
 ## run
 ```bash
 $ uvicorn api:app
-```
+``` 
